@@ -90,7 +90,7 @@ export function AboutCard() {
       <div className="text-sm">
         <h2 className="font-extrabold">Hi, I&apos;m Pip!</h2>
         <p className="mt-1 text-muted">
-          Everything in the plaza is hand-drawn, so have no pressure, just have fun exploring and make cool art!
+          Everything in the plaza is hand-drawn, so no pressure, just have fun exploring and make cool art!
         </p>
       </div>
     </section>

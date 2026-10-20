@@ -5,7 +5,7 @@
 Built with Next.js, TypeScript, and Supabase, with a custom pixel-drawing engine on the HTML Canvas API.
 
 > **Status:** early development. Drawing, animating, and posting work end to end (posts are saved in the browser until accounts exist). Accounts are next.
-> **Live demo:** _coming soon_
+> **Live demo:** https://doodle-plaza.vercel.app/
 
 ## What works today
 
