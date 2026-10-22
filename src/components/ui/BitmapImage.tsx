@@ -20,11 +20,11 @@ export function BitmapImage({
   // Decode during render so bad data shows a placeholder right away.
   const bitmap = useMemo(() => {
     try {
-      return decodeBitmap(data);
+      return decodeBitmap(data, { width, height });
     } catch {
       return null;
     }
-  }, [data]);
+  }, [data, width, height]);
 
   useEffect(() => {
     if (bitmap) paintBitmap(ref.current, bitmap);

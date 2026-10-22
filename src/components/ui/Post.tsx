@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import {
   type Post,
   type Reply,
@@ -65,9 +66,19 @@ export function PostBodyView({ body, label }: { body: ReplyBody; label: string }
   return <p className="speech text-lg">{body.text}</p>;
 }
 
-export function PostCard({ post, showPlaza = true }: { post: Post; showPlaza?: boolean }) {
+export function PostCard({
+  post,
+  showPlaza = true,
+  yeahed,
+}: {
+  post: Post;
+  showPlaza?: boolean;
+  /** Real posts only: whether you've yeahed it. Turns on saving for the Yeah! button. */
+  yeahed?: boolean;
+}) {
   const name = post.authorName ?? getUser(post.author)?.name ?? post.author;
-  const replies = replyCount(post.id);
+  const replies = post.replyCount ?? replyCount(post.id);
+  const live = post.replyCount !== undefined;
   const kind = post.body.type === "animation" ? "Animation" : "Drawing";
   const label = post.caption ? `${kind} by ${name}: ${post.caption}` : `${kind} by ${name}`;
 
@@ -93,7 +104,7 @@ export function PostCard({ post, showPlaza = true }: { post: Post; showPlaza?: b
       {post.caption && <p className="font-semibold">{post.caption}</p>}
 
       <footer className="flex items-center gap-2">
-        <YeahButton count={post.yeahs} />
+        <YeahButton count={post.yeahs} postId={live ? post.id : undefined} yeahed={yeahed} />
         <Link href={`/p/${post.id}`} className="pill-link">
           <ReplyIcon size={17} />
           <span className="tabular-nums">{replies}</span>
@@ -128,20 +139,18 @@ export function DoodleTile({ post }: { post: Post }) {
   );
 }
 
-export function ReplyCard({ reply }: { reply: Reply }) {
-  const user = getUser(reply.author);
+export function ReplyCard({ reply, actions }: { reply: Reply; actions?: ReactNode }) {
+  const name = reply.authorName ?? getUser(reply.author)?.name ?? reply.author;
   return (
     <article className="flex flex-col gap-2.5 border-t-2 border-leaf-light px-4 py-4 sm:px-5">
       <header className="flex items-center gap-3">
-        <AuthorName handle={reply.author} />
+        <AuthorName handle={reply.author} name={name} />
         <span className="ml-auto text-sm text-muted">{reply.ago}</span>
       </header>
-      <div className={reply.body.type === "drawing" ? "max-w-md" : ""}>
-        <PostBodyView body={reply.body} label={`Reply drawing by ${user?.name}`} />
+      <div className={reply.body.type === "text" ? "" : "max-w-md"}>
+        <PostBodyView body={reply.body} label={`Reply drawing by ${name}`} />
       </div>
-      <div>
-        <YeahButton count={reply.yeahs} size="sm" />
-      </div>
+      {actions && <div className="flex items-center gap-2">{actions}</div>}
     </article>
   );
 }

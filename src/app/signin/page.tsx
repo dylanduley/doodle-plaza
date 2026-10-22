@@ -9,7 +9,7 @@ type Props = { searchParams: Promise<{ next?: string }> };
 export default async function MakeProfilePage({ searchParams }: Props) {
   const { next } = await searchParams;
   // Only same-site paths, so the link can't send people to another website.
-  const safeNext = next?.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const safeNext = next && /^\/(?![/\\])/.test(next) ? next : "/";
 
   return (
     <div className="flex flex-col gap-5">

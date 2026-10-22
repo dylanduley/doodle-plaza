@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LivePostView } from "@/components/post/LivePostView";
+import { SampleReplyNotice } from "@/components/post/SampleReplyNotice";
 import { SectionBar } from "@/components/ui/Blocks";
-import { ArrowRightIcon, ReplyIcon, SignInIcon } from "@/components/ui/icons";
+import { ArrowRightIcon, ReplyIcon } from "@/components/ui/icons";
 import { AuthorName, DoodleTile, PlazaChip, PostBodyView, ReplyCard } from "@/components/ui/Post";
 import { YeahButton } from "@/components/ui/YeahButton";
 import { getPost, getUser, posts, postsByUser, repliesTo } from "@/lib/mock/data";
@@ -70,14 +71,7 @@ export default async function PostPage({ params, searchParams }: Props) {
           </section>
         )}
 
-        <div className="flex flex-col items-start gap-3 border-t-2 border-leaf-light bg-leaf-light/50 px-5 py-5 sm:flex-row sm:items-center sm:px-6">
-          <p className="font-semibold">
-            {replies.length === 0 ? "No replies yet. " : ""}Replies can be text or a doodle.
-          </p>
-          <Link href={`/signin?next=/p/${post.id}`} className="btn sm:ml-auto">
-            <SignInIcon size={18} /> Make a profile to reply
-          </Link>
-        </div>
+        <SampleReplyNotice postId={post.id} hasReplies={replies.length > 0} />
       </article>
 
       {more.length > 0 && (

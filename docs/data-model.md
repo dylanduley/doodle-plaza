@@ -77,6 +77,13 @@ Insert-only. Reports are reviewed in the Supabase dashboard.
 
 Security rules check **who** is writing, not **what** they write, so the tables also enforce limits with check constraints: handle format, text lengths, allowed plazas and canvas sizes, frame count (≤ 100), and a maximum total size per post (3 million characters, far above any real drawing). That way nobody can skip the UI and store something huge.
 
+## Extra protection (second migration)
+
+- **Inserts are limited to the columns the app sends.** Ids, authors, and `created_at` are always set by the database, so nobody can backdate or future-date a post to pin it to the top of a feed, or fake a "joined" date.
+- **Hourly limits per person:** 20 posts, 60 replies, 300 yeahs, 20 reports. Going over returns a friendly "take a short break" message.
+- **Guest sign-up** is protected by Cloudflare Turnstile (CAPTCHA) and Supabase's own rate limit on anonymous sign-ins.
+- **In the browser,** drawings from the database are checked before they're drawn (size and colors), since they come from other people.
+
 ## Choices and trade-offs
 
 - **No yeahs on replies (for now).** Keeps it to one yeahs table. The reply Yeah! buttons in the UI go away until there's a reason to bring them back.

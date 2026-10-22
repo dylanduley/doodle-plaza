@@ -74,6 +74,7 @@ export async function createGuestProfile(input: {
   handle: string;
   displayName: string;
   avatar: string;
+  captchaToken?: string;
 }): Promise<Profile> {
   const supabase = createClient();
 
@@ -82,7 +83,7 @@ export async function createGuestProfile(input: {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    const { data, error } = await supabase.auth.signInAnonymously();
+    const { data, error } = await supabase.auth.signInAnonymously({ options: { captchaToken: input.captchaToken } });
     if (error || !data.user) {
       console.error(error);
       throw new ProfileError("We couldn't start your profile. Check your connection and try again.");

@@ -19,6 +19,7 @@ import {
   suggestHandle,
 } from "@/lib/profiles";
 import { useMyProfile } from "@/lib/useMyProfile";
+import { Turnstile, TURNSTILE_SITE_KEY } from "./Turnstile";
 
 export function MakeProfile({ next }: { next: string }) {
   const { loading, profile } = useMyProfile();
@@ -89,6 +90,10 @@ function ProfileForm({ api, next }: { api: EditorApi; next: string }) {
   const [handleTaken, setHandleTaken] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>({ state: "idle" });
   const [attempted, setAttempted] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  // tokens are single use, so remount the widget after a failed attempt
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const captchaError = TURNSTILE_SITE_KEY && !captchaToken ? "Please finish the quick check below." : null;
 
   const saving = status.state === "saving" || status.state === "saved";
   const pictureError = api.blank ? "Draw your profile picture first!" : null;
@@ -107,14 +112,22 @@ function ProfileForm({ api, next }: { api: EditorApi; next: string }) {
     if (pictureError) return;
     if (nameError) return nameRef.current?.focus();
     if (handleError) return handleRef.current?.focus();
+    if (captchaError) return;
 
     setStatus({ state: "saving" });
     try {
-      await createGuestProfile({ handle, displayName: name, avatar: encodeBitmap(api.getBitmap()) });
+      await createGuestProfile({
+        handle,
+        displayName: name,
+        avatar: encodeBitmap(api.getBitmap()),
+        captchaToken: captchaToken ?? undefined,
+      });
       setStatus({ state: "saved" });
       router.push(next);
       router.refresh();
     } catch (err) {
+      setCaptchaToken(null);
+      setCaptchaKey((k) => k + 1);
       if (err instanceof ProfileError && err.field === "handle") {
         setHandleTaken(handle);
         setStatus({ state: "idle" });
@@ -210,6 +223,15 @@ function ProfileForm({ api, next }: { api: EditorApi; next: string }) {
           </button>
         </div>
       )}
+
+      <div className="flex flex-col gap-1.5">
+        <Turnstile key={captchaKey} onToken={setCaptchaToken} />
+        {attempted && captchaError && (
+          <p role="alert" className="field-error">
+            {captchaError}
+          </p>
+        )}
+      </div>
 
       <p className="rounded-xl bg-leaf-light px-4 py-3 text-sm font-semibold text-leaf-deep">
         This is a temporary profile saved to this browser. Full accounts are coming soon. If you clear

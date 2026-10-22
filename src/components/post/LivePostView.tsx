@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TrashIcon } from "@/components/editor/icons";
 import { EmptyState } from "@/components/ui/Blocks";
-import { PencilIcon, ReplyIcon, SignInIcon } from "@/components/ui/icons";
+import { ReplyIcon } from "@/components/ui/icons";
 import { AuthorName, PlazaChip, PostBodyView } from "@/components/ui/Post";
 import { YeahButton } from "@/components/ui/YeahButton";
 import { getPlaza } from "@/lib/mock/data";
 import { deletePost, fetchPost, type LivePost, PostError } from "@/lib/posts";
 import { useMyProfile } from "@/lib/useMyProfile";
+import { useMyYeahs } from "@/lib/useMyYeahs";
+import { LiveReplies } from "./LiveReplies";
 
 type State = { state: "loading" } | { state: "missing" } | { state: "error"; message: string } | { state: "ready"; post: LivePost };
 
@@ -20,6 +22,8 @@ export function LivePostView({ id, justPosted }: { id: string; justPosted: boole
   const router = useRouter();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [replyCount, setReplyCount] = useState<number | null>(null);
+  const myYeahs = useMyYeahs(loaded.state === "ready" ? [loaded.post.id] : []);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,6 +66,7 @@ export function LivePostView({ id, justPosted }: { id: string; justPosted: boole
   const kind = post.body.type === "animation" ? "Animation" : "Drawing";
   const label = post.caption ? `${kind} by ${name}: ${post.caption}` : `${kind} by ${name}`;
   const plazaName = getPlaza(post.plaza)?.name ?? "the plaza";
+  const replies = replyCount ?? post.replyCount ?? 0;
 
   async function remove() {
     setDeleteError(null);
@@ -95,9 +100,9 @@ export function LivePostView({ id, justPosted }: { id: string; justPosted: boole
           {post.caption && <h1 className="text-xl font-extrabold">{post.caption}</h1>}
 
           <div className="flex flex-wrap items-center gap-2">
-            <YeahButton count={post.yeahs} />
+            <YeahButton count={post.yeahs} postId={post.id} yeahed={myYeahs?.has(post.id) ?? false} />
             <span className="pill-link pointer-events-none">
-              <ReplyIcon size={17} /> 0 replies
+              <ReplyIcon size={17} /> {replies} {replies === 1 ? "reply" : "replies"}
             </span>
 
             {isMine && (
@@ -132,18 +137,7 @@ export function LivePostView({ id, justPosted }: { id: string; justPosted: boole
           )}
         </div>
 
-        <div className="flex flex-col items-start gap-3 border-t-2 border-leaf-light bg-leaf-light/50 px-5 py-5 sm:flex-row sm:items-center sm:px-6">
-          <p className="font-semibold">No replies yet. Replies are coming soon.</p>
-          {profile ? (
-            <Link href="/draw" className="btn sm:ml-auto">
-              <PencilIcon size={18} /> Draw something
-            </Link>
-          ) : (
-            <Link href={`/signin?next=/p/${post.id}`} className="btn sm:ml-auto">
-              <SignInIcon size={18} /> Make your profile
-            </Link>
-          )}
-        </div>
+        <LiveReplies postId={post.id} onCountChange={setReplyCount} />
       </article>
     </div>
   );

@@ -42,11 +42,11 @@ export function AnimationPlayer({
 
   const decoded = useMemo<Bitmap[] | null>(() => {
     try {
-      return frames.map(decodeBitmap);
+      return frames.map((f) => decodeBitmap(f, { width, height }));
     } catch {
       return null;
     }
-  }, [frames]);
+  }, [frames, width, height]);
 
   const draw = useCallback(
     (i: number) => {

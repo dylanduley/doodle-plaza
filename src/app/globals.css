@@ -417,6 +417,9 @@ body {
   .pill-link:hover {
     background: var(--color-leaf-light);
   }
+  .pill-link[aria-pressed="true"] {
+    @apply bg-leaf text-white;
+  }
 
   .yeah {
     @apply inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-sm font-extrabold text-leaf-dark transition-colors;

@@ -1,41 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { getMyProfile, PROFILE_CHANGED, type Profile } from "@/lib/profiles";
 import { createClient } from "@/lib/supabase/client";
 
+type State = { loading: boolean; profile: Profile | null };
+
 const hasSupabase = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-export function useMyProfile() {
-  const [state, setState] = useState<{ loading: boolean; profile: Profile | null }>(() => ({
-    loading: hasSupabase,
-    profile: null,
-  }));
+// One shared copy for the whole page, so the header and every Yeah! button
+// don't each fetch the profile.
+const SERVER_STATE: State = { loading: hasSupabase, profile: null };
+let state: State = SERVER_STATE;
+const listeners = new Set<() => void>();
+let started = false;
 
-  useEffect(() => {
-    if (!hasSupabase) return;
-    let cancelled = false;
-    const load = () => {
-      getMyProfile()
-        .then((profile) => !cancelled && setState({ loading: false, profile }))
-        .catch(() => !cancelled && setState({ loading: false, profile: null }));
-    };
-    load();
+function set(next: State) {
+  state = next;
+  listeners.forEach((l) => l());
+}
 
-    // Supabase docs: don't call Supabase inside this callback, so defer it
-    const {
-      data: { subscription },
-    } = createClient().auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") setTimeout(load, 0);
-    });
-    window.addEventListener(PROFILE_CHANGED, load);
+function load() {
+  getMyProfile()
+    .then((profile) => set({ loading: false, profile }))
+    .catch(() => set({ loading: false, profile: null }));
+}
 
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-      window.removeEventListener(PROFILE_CHANGED, load);
-    };
-  }, []);
+function start() {
+  if (started || !hasSupabase) return;
+  started = true;
+  load();
+  // Supabase docs: don't call Supabase inside this callback, so defer it
+  createClient().auth.onAuthStateChange((event) => {
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT") setTimeout(load, 0);
+  });
+  window.addEventListener(PROFILE_CHANGED, load);
+}
 
-  return state;
+function subscribe(listener: () => void) {
+  start();
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+export function useMyProfile(): State {
+  return useSyncExternalStore(
+    subscribe,
+    () => state,
+    () => SERVER_STATE,
+  );
 }

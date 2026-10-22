@@ -31,11 +31,12 @@ type PostRow = {
   created_at: string;
   author: { handle: string; display_name: string; avatar: string } | null;
   yeahs: { count: number }[];
+  replies: { count: number }[];
 };
 
-// profiles!posts_author_id_fkey: posts link to profiles twice (author, and via yeahs), so name the author one
+// posts link to profiles twice (author, and via yeahs) and to replies twice (directly, and via reports), so name the links
 const POST_FIELDS =
-  "id, author_id, plaza, caption, width, height, frames, fps, created_at, author:profiles!posts_author_id_fkey(handle, display_name, avatar), yeahs(count)";
+  "id, author_id, plaza, caption, width, height, frames, fps, created_at, author:profiles!posts_author_id_fkey(handle, display_name, avatar), yeahs(count), replies!replies_post_id_fkey(count)";
 
 export function timeAgo(iso: string, now = Date.now()): string {
   const seconds = Math.max(0, (now - Date.parse(iso)) / 1000);
@@ -62,6 +63,7 @@ function toLivePost(row: PostRow): LivePost {
         ? { type: "animation", frames: row.frames, width: row.width, height: row.height, fps: row.fps ?? 8 }
         : { type: "bitmap", data: first, width: row.width, height: row.height },
     yeahs: row.yeahs[0]?.count ?? 0,
+    replyCount: row.replies[0]?.count ?? 0,
   };
 }
 
@@ -117,6 +119,10 @@ export async function createPost(
   if (error) {
     // 23503 = foreign key: signed in, but no profile row yet.
     if (error.code === "23503") throw new PostError("no-profile", "You need a profile to post.");
+    // P0001 = the hourly limit from the rate-limit trigger
+    if (error.code === "P0001") {
+      throw new PostError("network", "You've posted a lot in the last hour. Take a short break and try again soon.");
+    }
     // 23514 = a check constraint, most likely the size limit.
     if (error.code === "23514") {
       throw new PostError("too-big", "This animation is too big to post. Try removing some frames.");

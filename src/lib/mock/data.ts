@@ -32,6 +32,7 @@ export type Post = {
   author: string;
   // only set on real posts
   authorName?: string;
+  replyCount?: number;
   plaza: string;
   // TODO: store real timestamps
   ago: string;
@@ -44,6 +45,7 @@ export type Reply = {
   id: string;
   postId: string;
   author: string;
+  authorName?: string;
   ago: string;
   body: ReplyBody;
   yeahs: number;
