@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LocalPostsFeed } from "@/components/post/LocalPostsFeed";
+import { PostsFeed } from "@/components/post/PostsFeed";
 import { EmptyState, PlazaList, PromptCard, SectionBar } from "@/components/ui/Blocks";
 import { ClockIcon, PencilIcon } from "@/components/ui/icons";
 import { PostCard } from "@/components/ui/Post";
@@ -45,7 +45,7 @@ export default async function PlazaPage({ params }: Props) {
 
         <section className="flex flex-col gap-4" aria-labelledby="plaza-feed-heading">
           <SectionBar id="plaza-feed-heading" icon={<ClockIcon size={20} />} title="Latest posts" />
-          <LocalPostsFeed plaza={plaza.slug} />
+          <PostsFeed plaza={plaza.slug} />
           {feed.length === 0 ? (
             <EmptyState title="No doodles yet">
               <p>Be the first to post in {plaza.name}.</p>

@@ -38,6 +38,8 @@ type Props = {
   height?: number;
   footer?: (api: EditorApi) => ReactNode;
   animated?: boolean;
+  /** only read on mount */
+  initial?: Bitmap;
 };
 
 const SIZE_ICON = [14, 19, 25] as const;
@@ -48,10 +50,11 @@ export function DrawingEditor({
   height = CANVAS_HEIGHT,
   footer,
   animated = false,
+  initial,
 }: Props) {
   // Refs kept separate from render data (React Compiler lint).
   const { viewportRef, viewRef, ...view } = useCanvasView();
-  const { canvasRef, ...editor } = useDrawingEditor({ width, height, viewRef, animated });
+  const { canvasRef, ...editor } = useDrawingEditor({ width, height, viewRef, animated, initial });
 
   const download = async () => {
     const blob = await editor.toPngBlob(4);

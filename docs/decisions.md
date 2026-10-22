@@ -102,7 +102,7 @@ Each entry records what was decided, the alternatives, and why. Add new entries 
 
 ## 14. Square 120×120 canvas for profile pictures
 
-**Decision:** Profile pictures get their own square 120×120 canvas (`/draw/profile`), separate from the 320×120 post canvas. The editor takes its size as a prop, so it's the same component and tools.
+**Decision:** Profile pictures get their own square 120×120 canvas (now part of "Make your profile" at `/signin`), separate from the 320×120 post canvas. The editor takes its size as a prop, so it's the same component and tools.
 
 **Why:** A profile picture is shown small and square next to a name, so a wide banner shape would be cropped or squished. 120 matches the post canvas height, so the pixel scale feels the same. The editor's stage keeps at least a 16:10 shape and fits the canvas inside it in both directions (CSS container units), so a square canvas doesn't become enormous on a wide screen.
 

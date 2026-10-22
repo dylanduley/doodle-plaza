@@ -34,6 +34,7 @@ type Options = {
   height: number;
   viewRef: RefObject<View>;
   animated?: boolean;
+  initial?: Bitmap;
 };
 
 type Frame = { id: number; bitmap: Bitmap; history: History; rev: number };
@@ -53,9 +54,9 @@ function newFrame(width: number, height: number, bitmap?: Bitmap): Frame {
 
 // Frames live in a ref, not state, since pixels change on every pointer move.
 // After each change we publish a small snapshot to state for the UI.
-export function useDrawingEditor({ width, height, viewRef, animated = false }: Options) {
+export function useDrawingEditor({ width, height, viewRef, animated = false, initial }: Options) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [initialFrames] = useState(() => [newFrame(width, height)]);
+  const [initialFrames] = useState(() => [newFrame(width, height, initial && cloneBitmap(initial))]);
   const framesRef = useRef<Frame[]>(initialFrames);
   const currentRef = useRef(0);
   const rgbPalette = useMemo(() => paletteToRgb(PALETTE), []);
@@ -75,8 +76,8 @@ export function useDrawingEditor({ width, height, viewRef, animated = false }: O
   const [current, setCurrent] = useState(0);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
-  const [blank, setBlank] = useState(true);
-  const [allBlank, setAllBlank] = useState(true);
+  const [blank, setBlank] = useState(() => isBlank(initialFrames[0].bitmap));
+  const [allBlank, setAllBlank] = useState(() => isBlank(initialFrames[0].bitmap));
   const [canRestoreFrame, setCanRestoreFrame] = useState(false);
 
   const [onion, setOnion] = useState(true);

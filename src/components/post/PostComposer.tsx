@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useId, useRef, useState } from "react";
+import { type SubmitEvent, useEffect, useId, useRef, useState } from "react";
 import { DrawingEditor, type EditorApi } from "@/components/editor/DrawingEditor";
+import { ProfileNeededNotice } from "@/components/profile/ProfileNeededNotice";
 import { plazas } from "@/lib/mock/data";
 import { ANIMATION_HEIGHT, ANIMATION_WIDTH, CANVAS_HEIGHT, CANVAS_WIDTH } from "@/lib/pixel/constants";
-import { CAPTION_MAX, createLocalPost, PostError } from "@/lib/local/posts";
+import { CAPTION_MAX, createPost, PostError } from "@/lib/posts";
+import { useMyProfile } from "@/lib/useMyProfile";
 
 type Props = {
   animated?: boolean;
@@ -16,12 +18,15 @@ type Props = {
 
 export function PostComposer({ animated = false, ...props }: Props) {
   return (
-    <DrawingEditor
-      animated={animated}
-      width={animated ? ANIMATION_WIDTH : CANVAS_WIDTH}
-      height={animated ? ANIMATION_HEIGHT : CANVAS_HEIGHT}
-      footer={(api) => <ComposerForm api={api} {...props} />}
-    />
+    <>
+      <ProfileNeededNotice next={animated ? "/draw/animate" : "/draw"} />
+      <DrawingEditor
+        animated={animated}
+        width={animated ? ANIMATION_WIDTH : CANVAS_WIDTH}
+        height={animated ? ANIMATION_HEIGHT : CANVAS_HEIGHT}
+        footer={(api) => <ComposerForm api={api} {...props} />}
+      />
+    </>
   );
 }
 
@@ -34,6 +39,7 @@ type Status =
 function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props & { api: EditorApi }) {
   const router = useRouter();
   const id = useId();
+  const { profile } = useMyProfile();
   const plazaRef = useRef<HTMLSelectElement | null>(null);
   const failNextAttempt = useRef(simulateError);
 
@@ -63,7 +69,7 @@ function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props &
     return () => window.removeEventListener("beforeunload", warn);
   }, [api.blank, status.state]);
 
-  async function submit(e?: FormEvent) {
+  async function submit(e?: SubmitEvent<HTMLFormElement>) {
     e?.preventDefault();
     if (posting) return;
     setAttempted(true);
@@ -77,7 +83,7 @@ function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props &
     try {
       const simulateNetworkError = failNextAttempt.current;
       failNextAttempt.current = false;
-      const post = await createLocalPost(
+      const post = await createPost(
         { frames: api.getFrames(), fps: api.fps, caption, plaza },
         { simulateNetworkError },
       );
@@ -177,7 +183,13 @@ function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props &
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
         <p className="text-sm text-muted">
-          Until accounts launch, posts are saved in this browser only.
+          {profile ? (
+            <>
+              Posting as <strong className="text-ink">@{profile.handle}</strong>
+            </>
+          ) : (
+            "You need a profile to post."
+          )}
         </p>
         <button type="submit" className="btn btn-primary sm:ml-auto" disabled={posting} aria-live="polite">
           {posting ? (

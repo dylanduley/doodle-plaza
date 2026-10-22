@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LocalPostsFeed } from "@/components/post/LocalPostsFeed";
+import { PostsFeed } from "@/components/post/PostsFeed";
 import { AboutCard, PlazaList, PromptCard, SectionBar } from "@/components/ui/Blocks";
 import { ClockIcon, PencilIcon, PlazasIcon, TrendingIcon } from "@/components/ui/icons";
 import { Mascot } from "@/components/ui/Mascot";
@@ -53,7 +53,7 @@ export default function Home() {
 
         <section aria-labelledby="fresh-heading" className="flex flex-col gap-4">
           <SectionBar id="fresh-heading" icon={<ClockIcon size={20} />} title="Latest posts" />
-          <LocalPostsFeed />
+          <PostsFeed />
           <ul className="flex flex-col gap-4">
             {posts.map((post) => (
               <li key={post.id}>

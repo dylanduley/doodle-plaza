@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LocalPostView } from "@/components/post/LocalPostView";
+import { LivePostView } from "@/components/post/LivePostView";
 import { SectionBar } from "@/components/ui/Blocks";
 import { ArrowRightIcon, ReplyIcon, SignInIcon } from "@/components/ui/icons";
 import { AuthorName, DoodleTile, PlazaChip, PostBodyView, ReplyCard } from "@/components/ui/Post";
 import { YeahButton } from "@/components/ui/YeahButton";
-import { isLocalPostId } from "@/lib/local/posts";
 import { getPost, getUser, posts, postsByUser, repliesTo } from "@/lib/mock/data";
+import { isLivePostId } from "@/lib/posts";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -20,7 +20,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  if (isLocalPostId(id)) return { title: "Your doodle" };
+  if (isLivePostId(id)) return { title: "Doodle" };
   const post = getPost(id);
   if (!post) return { title: "Post not found" };
   const name = getUser(post.author)?.name ?? post.author;
@@ -29,9 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PostPage({ params, searchParams }: Props) {
   const { id } = await params;
-  // Local posts live in localStorage, so this page renders on the client.
-  if (isLocalPostId(id)) {
-    return <LocalPostView id={id} justPosted={(await searchParams).posted === "1"} />;
+  if (isLivePostId(id)) {
+    return <LivePostView id={id} justPosted={(await searchParams).posted === "1"} />;
   }
   const post = getPost(id);
   if (!post) notFound();
@@ -75,8 +74,8 @@ export default async function PostPage({ params, searchParams }: Props) {
           <p className="font-semibold">
             {replies.length === 0 ? "No replies yet. " : ""}Replies can be text or a doodle.
           </p>
-          <Link href="/signin" className="btn sm:ml-auto">
-            <SignInIcon size={18} /> Sign in to reply
+          <Link href={`/signin?next=/p/${post.id}`} className="btn sm:ml-auto">
+            <SignInIcon size={18} /> Make a profile to reply
           </Link>
         </div>
       </article>

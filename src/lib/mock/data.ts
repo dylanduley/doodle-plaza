@@ -30,6 +30,8 @@ export type ReplyBody = PostBody | { type: "text"; text: string };
 export type Post = {
   id: string;
   author: string;
+  // only set on real posts
+  authorName?: string;
   plaza: string;
   // TODO: store real timestamps
   ago: string;
@@ -60,8 +62,6 @@ export const users: User[] = [
   { handle: "sprocket", name: "Sprocket", bio: "Learning to animate one frame at a time.", joined: "Oct 2026" },
   { handle: "nightowl", name: "Night Owl", bio: "Posting after midnight since forever.", joined: "Oct 2026" },
   { handle: "tomatoes", name: "Tom", bio: "Gardener. The flowers are real, the drawing skills are not.", joined: "Oct 2026" },
-  // Posts made on this device before accounts exist (see lib/local/posts.ts)
-  { handle: "you", name: "You", bio: "Doodles you've posted from this device.", joined: "today" },
 ];
 
 export const plazas: Plaza[] = [
@@ -123,7 +123,7 @@ export const posts: Post[] = [
   { id: "p7", author: "tomatoes", plaza: "daily-prompt", ago: "5h", caption: "a field of flowers", body: { type: "drawing", kind: "garden", seed: 9 }, yeahs: 31 },
   { id: "a2", author: "mossy", plaza: "tiny-worlds", ago: "6h", caption: "a boat in the sea", body: sampleAnimation("boat", 2, 8), yeahs: 71 },
   { id: "p8", author: "mossy", plaza: "tiny-worlds", ago: "7h", caption: "weekend hike, from memory", body: { type: "drawing", kind: "mountains", seed: 2 }, yeahs: 55 },
-  { id: "p9", author: "kiko", plaza: "doodle-qa", ago: "9h", caption: "day 3 of trying to draw cats. tips??", body: { type: "drawing", kind: "cat", seed: 18 }, yeahs: 76 },
+  { id: "p9", author: "kiko", plaza: "doodle-qa", ago: "9h", caption: "day 3 of trying to draw a horse. day 3 of drawing a cat instead. tips??", body: { type: "drawing", kind: "cat", seed: 18 }, yeahs: 76 },
   { id: "p10", author: "nightowl", plaza: "daily-prompt", ago: "11h", caption: "prompt: a rainy day", body: { type: "drawing", kind: "rain", seed: 6 }, yeahs: 48 },
   { id: "p11", author: "sprocket", plaza: "tiny-worlds", ago: "1d", caption: "sailing practice", body: { type: "drawing", kind: "sea", seed: 8 }, yeahs: 39 },
   { id: "p12", author: "lunabee", plaza: "spooky-season", ago: "1d", caption: "the ghost is friendly I promise", body: { type: "drawing", kind: "ghost", seed: 12 }, yeahs: 22 },

@@ -30,8 +30,8 @@ export default async function DrawPage({ searchParams }: Props) {
             <Link href="/draw/animate" className="pill-link">
               <PlayIcon size={16} /> Make an animation
             </Link>
-            <Link href="/draw/profile" className="pill-link">
-              Draw your profile picture
+            <Link href="/signin" className="pill-link">
+              Make your profile
             </Link>
           </div>
         )}

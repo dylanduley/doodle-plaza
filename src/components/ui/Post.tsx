@@ -7,18 +7,17 @@ import {
   getUser,
   replyCount,
 } from "@/lib/mock/data";
-import { isLocalPostId } from "@/lib/local/posts";
 import { AnimationPlayer } from "./AnimationPlayer";
 import { BitmapImage } from "./BitmapImage";
 import { DoodleImage } from "./DoodleImage";
 import { ReplyIcon, YeahIcon } from "./icons";
 import { YeahButton } from "./YeahButton";
 
-export function AuthorName({ handle }: { handle: string }) {
-  const user = getUser(handle);
+export function AuthorName({ handle, name }: { handle: string; name?: string }) {
+  const displayName = name ?? getUser(handle)?.name ?? handle;
   return (
     <Link href={`/u/${handle}`} className="group inline-flex min-w-0 items-baseline gap-1.5">
-      <span className="truncate font-extrabold group-hover:underline">{user?.name ?? handle}</span>
+      <span className="truncate font-extrabold group-hover:underline">{displayName}</span>
       <span className="truncate text-sm text-muted">@{handle}</span>
     </Link>
   );
@@ -66,31 +65,17 @@ export function PostBodyView({ body, label }: { body: ReplyBody; label: string }
   return <p className="speech text-lg">{body.text}</p>;
 }
 
-export function DeviceBadge() {
-  return (
-    <span
-      className="rounded-full border-2 border-dashed border-leaf-dark/40 px-2 py-0.5 text-xs font-bold text-leaf-dark"
-      title="Saved in this browser until accounts launch"
-    >
-      On this device
-    </span>
-  );
-}
-
 export function PostCard({ post, showPlaza = true }: { post: Post; showPlaza?: boolean }) {
-  const user = getUser(post.author);
+  const name = post.authorName ?? getUser(post.author)?.name ?? post.author;
   const replies = replyCount(post.id);
   const kind = post.body.type === "animation" ? "Animation" : "Drawing";
-  const label = post.caption
-    ? `${kind} by ${user?.name}: ${post.caption}`
-    : `${kind} by ${user?.name}`;
+  const label = post.caption ? `${kind} by ${name}: ${post.caption}` : `${kind} by ${name}`;
 
   return (
     <article className="card flex flex-col gap-3 p-4 sm:p-5">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <AuthorName handle={post.author} />
+        <AuthorName handle={post.author} name={name} />
         {showPlaza && <PlazaChip slug={post.plaza} />}
-        {isLocalPostId(post.id) && <DeviceBadge />}
         <Link href={`/p/${post.id}`} className="ml-auto text-sm text-muted hover:underline">
           {post.ago}
         </Link>

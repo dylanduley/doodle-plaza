@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PROFILE_PICTURE_SIZE } from "@/lib/pixel/constants";
+import { useMyProfile } from "@/lib/useMyProfile";
+import { BitmapImage } from "./BitmapImage";
 import { HomeIcon, PencilIcon, PlazasIcon, SignInIcon } from "./icons";
 import { Mascot } from "./Mascot";
 
@@ -35,16 +38,46 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Link
-          href="/signin"
-          aria-current={pathname === "/signin" ? "page" : undefined}
-          className="nav-link ml-auto"
-        >
-          <SignInIcon size={19} />
-          <span className="hidden sm:inline">Sign in</span>
-          <span className="sr-only sm:hidden">Sign in</span>
-        </Link>
+        <ProfileLink pathname={pathname} />
       </div>
     </header>
+  );
+}
+
+/** Your drawn profile picture once you have a profile, otherwise "Join". */
+function ProfileLink({ pathname }: { pathname: string }) {
+  const { loading, profile } = useMyProfile();
+
+  // Same size as the picture, so the header doesn't jump when it loads.
+  if (loading) return <span aria-hidden className="ml-auto size-9 rounded-xl bg-white/15" />;
+
+  if (!profile) {
+    return (
+      <Link href="/signin" aria-current={pathname === "/signin" ? "page" : undefined} className="nav-link ml-auto">
+        <SignInIcon size={19} />
+        <span className="hidden sm:inline">Join</span>
+        <span className="sr-only sm:hidden">Make your profile</span>
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      href={`/u/${profile.handle}`}
+      aria-current={pathname === `/u/${profile.handle}` ? "page" : undefined}
+      className="nav-link ml-auto py-1! pl-1!"
+      title={`@${profile.handle}`}
+      aria-label={`Your profile, @${profile.handle}`}
+    >
+      <span className="block size-8 overflow-hidden rounded-lg border-2 border-white bg-white">
+        <BitmapImage
+          data={profile.avatar}
+          width={PROFILE_PICTURE_SIZE}
+          height={PROFILE_PICTURE_SIZE}
+          label={`Your profile, ${profile.display_name}`}
+        />
+      </span>
+      <span className="hidden max-w-32 truncate sm:inline">{profile.display_name}</span>
+    </Link>
   );
 }

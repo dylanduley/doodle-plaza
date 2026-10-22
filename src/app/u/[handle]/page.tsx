@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { GuestProfile } from "@/components/post/GuestProfile";
+import { redirect } from "next/navigation";
+import { LiveProfile } from "@/components/profile/LiveProfile";
 import { EmptyState, SectionBar } from "@/components/ui/Blocks";
 import { ClockIcon } from "@/components/ui/icons";
 import { PostCard } from "@/components/ui/Post";
-import { GUEST_HANDLE } from "@/lib/local/posts";
 import { getUser, postsByUser, users, yeahsReceived } from "@/lib/mock/data";
 
 type Props = {
   params: Promise<{ handle: string }>;
-  searchParams: Promise<{ deleted?: string }>;
+  searchParams: Promise<{ deleted?: string; updated?: string }>;
 };
 
 export function generateStaticParams() {
@@ -18,16 +17,17 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const user = getUser((await params).handle);
-  return { title: user ? `${user.name} (@${user.handle})` : "User not found" };
+  return { title: user ? `${user.name} (@${user.handle})` : `@${(await params).handle}` };
 }
 
 export default async function ProfilePage({ params, searchParams }: Props) {
   const { handle } = await params;
-  if (handle === GUEST_HANDLE) {
-    return <GuestProfile justDeleted={(await searchParams).deleted === "1"} />;
-  }
+  if (handle === "you") redirect("/signin");
   const user = getUser(handle);
-  if (!user) notFound();
+  if (!user) {
+    const { deleted, updated } = await searchParams;
+    return <LiveProfile handle={handle} justDeleted={deleted === "1"} justUpdated={updated === "1"} />;
+  }
   const userPosts = postsByUser(handle);
   const drawings = userPosts.filter((p) => p.body.type === "drawing").length;
 
