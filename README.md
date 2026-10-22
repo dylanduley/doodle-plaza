@@ -103,11 +103,12 @@ src/
 docs/
   brief.md                Problem, users, scope
   decisions.md            Design and technical decisions, with alternatives
+  data-model.md           Database tables and access rules (Supabase)
 ```
 
 ## Process
 
-See [`docs/`](docs) for the product brief and decision log.
+See [`docs/`](docs) for the product brief, decision log, and data model.
 
 ## License
 

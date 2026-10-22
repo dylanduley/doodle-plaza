@@ -215,3 +215,15 @@ Quarter turns keep pixels aligned with the screen, which helps when drawing long
 **Changes:** removed the text post type (text is now reply-only in the data types), turned the three sample text posts into captioned drawings, and replaced the "Plaza Chatter" plaza with "Doodle Q&A", where you draw your question.
 
 **Trade-off:** a quick question like "how do you draw hands?" now needs a drawing, which is a little more effort. That fits the spirit of the app.
+
+## 25. Guest profiles on a shared backend (accounts later)
+
+**Problem:** posts, replies, and yeahs only lived in each person's browser, so nobody could see anyone else's activity. That's not really a social app, and it rules out testing with other people. Full accounts (email, passwords, recovery) are a lot of work for a two-week build.
+
+**Options:** (a) keep everything in the browser and add replies and yeahs there; (b) full accounts with Supabase Auth; (c) guest profiles: Supabase anonymous sign-in plus a shared database.
+
+**Decision:** (c). Browsing is open to everyone. When someone tries to post, reply, or Yeah!, they're asked to make a quick profile on the sign-in page: draw a 120×120 profile picture, pick a name and handle. That creates an anonymous Supabase identity, and everything they do is shared with everyone. The page says clearly that it's a temporary profile saved to this browser and that full accounts are coming soon.
+
+**Why:** it keeps the core idea (your drawn profile picture is your identity) and real shared activity, without building email accounts yet. Later, a guest can attach an email to the same identity, so nothing is lost.
+
+**Trade-offs:** clearing browser data or switching devices means a new profile. Open posting needs protection: row-level security, size limits on every table, CAPTCHA on guest sign-in, and reporting. See `docs/data-model.md` for the tables and access rules.
