@@ -6,7 +6,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
         <p>
           <span className="font-display text-base">Doodle Plaza</span> · a portfolio project by{" "}
-          <Link href="/u/dylan" className="font-bold underline">
+          <Link href="https://github.com/dylanduley" className="font-bold underline">
             Dylan Duley
           </Link>
         </p>

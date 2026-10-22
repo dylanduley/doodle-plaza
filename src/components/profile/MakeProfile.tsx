@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { type SubmitEvent, useId, useRef, useState } from "react";
 import { DrawingEditor, type EditorApi } from "@/components/editor/DrawingEditor";
 import { BitmapImage } from "@/components/ui/BitmapImage";
@@ -23,6 +22,7 @@ import { Turnstile, TURNSTILE_SITE_KEY } from "./Turnstile";
 
 export function MakeProfile({ next }: { next: string }) {
   const { loading, profile } = useMyProfile();
+  const [justJoined, setJustJoined] = useState(false);
 
   if (loading) {
     return (
@@ -32,20 +32,26 @@ export function MakeProfile({ next }: { next: string }) {
     );
   }
 
-  if (profile) return <AlreadyHasProfile profile={profile} />;
+  if (profile) return <AlreadyHasProfile profile={profile} justJoined={justJoined} next={next} />;
 
   return (
     <DrawingEditor
       width={PROFILE_PICTURE_SIZE}
       height={PROFILE_PICTURE_SIZE}
-      footer={(api) => <ProfileForm api={api} next={next} />}
+      footer={(api) => <ProfileForm api={api} onJoined={() => setJustJoined(true)} />}
     />
   );
 }
 
-function AlreadyHasProfile({ profile }: { profile: Profile }) {
+function AlreadyHasProfile({ profile, justJoined, next }: { profile: Profile; justJoined: boolean; next: string }) {
+  // where they were headed before making a profile (e.g. replying to a post)
+  const returnTo = justJoined && next !== "/" ? next : null;
+
   return (
-    <section className="card flex flex-col items-center gap-4 p-6 text-center sm:flex-row sm:text-left">
+    <section
+      className="card flex flex-col items-center gap-4 p-6 text-center sm:flex-row sm:text-left"
+      role={justJoined ? "status" : undefined}
+    >
       <div className="w-28 shrink-0 overflow-hidden rounded-2xl border-4 border-leaf-light">
         <BitmapImage
           data={profile.avatar}
@@ -55,12 +61,19 @@ function AlreadyHasProfile({ profile }: { profile: Profile }) {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <h2 className="text-xl font-extrabold">You&apos;re all set, {profile.display_name}!</h2>
+        <h2 className="text-xl font-extrabold">
+          {justJoined ? `Welcome to the plaza, ${profile.display_name}!` : `You're all set, ${profile.display_name}!`}
+        </h2>
         <p className="text-muted">
           You&apos;re <strong className="text-ink">@{profile.handle}</strong> on this browser.
         </p>
         <div className="mt-1 flex flex-wrap justify-center gap-2 sm:justify-start">
-          <Link href="/draw" className="btn btn-primary">
+          {returnTo && (
+            <Link href={returnTo} className="btn btn-primary">
+              Continue where you left off
+            </Link>
+          )}
+          <Link href="/draw" className={returnTo ? "btn" : "btn btn-primary"}>
             <PencilIcon size={18} /> Start drawing
           </Link>
           <Link href={`/u/${profile.handle}`} className="btn">
@@ -77,8 +90,7 @@ function AlreadyHasProfile({ profile }: { profile: Profile }) {
 
 type Status = { state: "idle" } | { state: "saving" } | { state: "error"; message: string } | { state: "saved" };
 
-function ProfileForm({ api, next }: { api: EditorApi; next: string }) {
-  const router = useRouter();
+function ProfileForm({ api, onJoined }: { api: EditorApi; onJoined: () => void }) {
   const id = useId();
   const nameRef = useRef<HTMLInputElement | null>(null);
   const handleRef = useRef<HTMLInputElement | null>(null);
@@ -123,8 +135,9 @@ function ProfileForm({ api, next }: { api: EditorApi; next: string }) {
         captchaToken: captchaToken ?? undefined,
       });
       setStatus({ state: "saved" });
-      router.push(next);
-      router.refresh();
+      onJoined();
+      // the form was at the bottom; bring the welcome message into view
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setCaptchaToken(null);
       setCaptchaKey((k) => k + 1);

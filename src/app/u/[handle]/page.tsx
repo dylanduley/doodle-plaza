@@ -4,16 +4,16 @@ import { LiveProfile } from "@/components/profile/LiveProfile";
 import { EmptyState, SectionBar } from "@/components/ui/Blocks";
 import { ClockIcon } from "@/components/ui/icons";
 import { PostCard } from "@/components/ui/Post";
-import { getUser, postsByUser, users, yeahsReceived } from "@/lib/mock/data";
+import { getUser, postsByUser } from "@/lib/mock/data";
 
 type Props = {
   params: Promise<{ handle: string }>;
   searchParams: Promise<{ deleted?: string; updated?: string }>;
 };
 
-export function generateStaticParams() {
-  return users.map((u) => ({ handle: u.handle }));
-}
+// Rendered per request: real profiles aren't known at build time, and the
+// page reads ?deleted / ?updated (not allowed on prebuilt pages in production).
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const user = getUser((await params).handle);
@@ -34,7 +34,6 @@ export default async function ProfilePage({ params, searchParams }: Props) {
   const stats = [
     { label: "Posts", value: userPosts.length },
     { label: "Drawings", value: drawings },
-    { label: "Yeahs received", value: yeahsReceived(handle) },
   ];
 
   return (
@@ -45,7 +44,7 @@ export default async function ProfilePage({ params, searchParams }: Props) {
           @{user.handle} · joined {user.joined}
         </p>
         <p className="mt-4 rounded-xl bg-cream px-4 py-3 text-ink">{user.bio}</p>
-        <dl className="mt-4 grid grid-cols-3 gap-3">
+        <dl className="mt-4 grid grid-cols-2 gap-3 sm:max-w-sm">
           {stats.map((s) => (
             <div key={s.label} className="rounded-xl bg-black/15 px-3 py-2 text-center">
               <dt className="text-xs font-bold uppercase tracking-wide text-white">{s.label}</dt>

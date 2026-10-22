@@ -39,7 +39,7 @@ type Status =
 function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props & { api: EditorApi }) {
   const router = useRouter();
   const id = useId();
-  const { profile } = useMyProfile();
+  const { loading, profile } = useMyProfile();
   const plazaRef = useRef<HTMLSelectElement | null>(null);
   const failNextAttempt = useRef(simulateError);
 
@@ -96,6 +96,9 @@ function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props &
       });
     }
   }
+
+  // no profile yet: the notice above the canvas explains what to do
+  if (loading || !profile) return null;
 
   return (
     <form
@@ -183,13 +186,7 @@ function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props &
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
         <p className="text-sm text-muted">
-          {profile ? (
-            <>
-              Posting as <strong className="text-ink">@{profile.handle}</strong>
-            </>
-          ) : (
-            "You need a profile to post."
-          )}
+          Posting as <strong className="text-ink">@{profile.handle}</strong>
         </p>
         <button type="submit" className="btn btn-primary sm:ml-auto" disabled={posting} aria-live="polite">
           {posting ? (

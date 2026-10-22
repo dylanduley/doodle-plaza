@@ -11,8 +11,19 @@ import {
 import { AnimationPlayer } from "./AnimationPlayer";
 import { BitmapImage } from "./BitmapImage";
 import { DoodleImage } from "./DoodleImage";
-import { ReplyIcon, YeahIcon } from "./icons";
+import { ReplyIcon } from "./icons";
 import { YeahButton } from "./YeahButton";
+
+export function SampleBadge() {
+  return (
+    <span
+      className="rounded-full border-2 border-dashed border-leaf-dark/40 px-2 py-0.5 text-xs font-bold text-leaf-dark"
+      title="An example post by Pip, the plaza mascot"
+    >
+      Sample
+    </span>
+  );
+}
 
 export function AuthorName({ handle, name }: { handle: string; name?: string }) {
   const displayName = name ?? getUser(handle)?.name ?? handle;
@@ -87,6 +98,7 @@ export function PostCard({
       <header className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <AuthorName handle={post.author} name={name} />
         {showPlaza && <PlazaChip slug={post.plaza} />}
+        {!live && <SampleBadge />}
         <Link href={`/p/${post.id}`} className="ml-auto text-sm text-muted hover:underline">
           {post.ago}
         </Link>
@@ -103,14 +115,17 @@ export function PostCard({
 
       {post.caption && <p className="font-semibold">{post.caption}</p>}
 
-      <footer className="flex items-center gap-2">
-        <YeahButton count={post.yeahs} postId={live ? post.id : undefined} yeahed={yeahed} />
-        <Link href={`/p/${post.id}`} className="pill-link">
-          <ReplyIcon size={17} />
-          <span className="tabular-nums">{replies}</span>
-          <span className="sr-only">{replies === 1 ? "reply" : "replies"}</span>
-        </Link>
-      </footer>
+      {/* sample posts can't be yeahed or replied to */}
+      {live && (
+        <footer className="flex items-center gap-2">
+          <YeahButton count={post.yeahs} postId={post.id} yeahed={yeahed} />
+          <Link href={`/p/${post.id}`} className="pill-link">
+            <ReplyIcon size={17} />
+            <span className="tabular-nums">{replies}</span>
+            <span className="sr-only">{replies === 1 ? "reply" : "replies"}</span>
+          </Link>
+        </footer>
+      )}
     </article>
   );
 }
@@ -130,10 +145,7 @@ export function DoodleTile({ post }: { post: Post }) {
       </div>
       <div className="flex items-center justify-between gap-2 px-1 pt-2 text-sm">
         <span className="truncate font-bold">{user?.name}</span>
-        <span className="flex items-center gap-1 font-bold text-leaf-dark">
-          <YeahIcon size={15} />
-          <span className="tabular-nums">{post.yeahs}</span>
-        </span>
+        <SampleBadge />
       </div>
     </Link>
   );

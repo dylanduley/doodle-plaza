@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { PopularStrip } from "@/components/post/PopularStrip";
 import { PostsFeed } from "@/components/post/PostsFeed";
 import { AboutCard, PlazaList, PromptCard, SectionBar } from "@/components/ui/Blocks";
-import { ClockIcon, PencilIcon, PlazasIcon, TrendingIcon } from "@/components/ui/icons";
+import { ClockIcon, PencilIcon, PlazasIcon } from "@/components/ui/icons";
 import { Mascot } from "@/components/ui/Mascot";
-import { DoodleTile, PostCard } from "@/components/ui/Post";
+import { PostCard } from "@/components/ui/Post";
 import { popularDrawings, posts } from "@/lib/mock/data";
 
 export default function Home() {
@@ -40,16 +41,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section aria-labelledby="popular-heading" className="flex flex-col gap-4">
-          <SectionBar id="popular-heading" icon={<TrendingIcon size={20} />} title="Popular this week" />
-          <ul className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
-            {popular.map((post) => (
-              <li key={post.id}>
-                <DoodleTile post={post} />
-              </li>
-            ))}
-          </ul>
-        </section>
+        <PopularStrip samples={popular} />
 
         <section aria-labelledby="fresh-heading" className="flex flex-col gap-4">
           <SectionBar id="fresh-heading" icon={<ClockIcon size={20} />} title="Latest posts" />

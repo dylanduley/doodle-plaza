@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LivePostView } from "@/components/post/LivePostView";
-import { SampleReplyNotice } from "@/components/post/SampleReplyNotice";
 import { SectionBar } from "@/components/ui/Blocks";
-import { ArrowRightIcon, ReplyIcon } from "@/components/ui/icons";
-import { AuthorName, DoodleTile, PlazaChip, PostBodyView, ReplyCard } from "@/components/ui/Post";
-import { YeahButton } from "@/components/ui/YeahButton";
-import { getPost, getUser, posts, postsByUser, repliesTo } from "@/lib/mock/data";
+import { ArrowRightIcon } from "@/components/ui/icons";
+import { AuthorName, DoodleTile, PlazaChip, PostBodyView, SampleBadge } from "@/components/ui/Post";
+import { getPost, getUser, postsByUser } from "@/lib/mock/data";
 import { isLivePostId } from "@/lib/posts";
 
 type Props = {
@@ -15,9 +13,9 @@ type Props = {
   searchParams: Promise<{ posted?: string }>;
 };
 
-export function generateStaticParams() {
-  return posts.map((p) => ({ id: p.id }));
-}
+// Rendered per request: real posts aren't known at build time, and the page
+// reads ?posted (not allowed on prebuilt pages in production).
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
@@ -36,7 +34,6 @@ export default async function PostPage({ params, searchParams }: Props) {
   const post = getPost(id);
   if (!post) notFound();
   const user = getUser(post.author);
-  const replies = repliesTo(post.id);
   const more = postsByUser(post.author)
     .filter((p) => p.id !== post.id && p.body.type === "drawing")
     .slice(0, 4);
@@ -48,6 +45,7 @@ export default async function PostPage({ params, searchParams }: Props) {
           <header className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <AuthorName handle={post.author} />
             <PlazaChip slug={post.plaza} />
+            <SampleBadge />
             <span className="ml-auto text-sm text-muted">{post.ago} ago</span>
           </header>
           <PostBodyView
@@ -55,23 +53,7 @@ export default async function PostPage({ params, searchParams }: Props) {
             label={post.caption ? `Drawing by ${user?.name}: ${post.caption}` : `Drawing by ${user?.name}`}
           />
           {post.caption && <h1 className="text-xl font-extrabold">{post.caption}</h1>}
-          <div className="flex items-center gap-2">
-            <YeahButton count={post.yeahs} />
-            <span className="pill-link pointer-events-none">
-              <ReplyIcon size={17} /> {replies.length} {replies.length === 1 ? "reply" : "replies"}
-            </span>
-          </div>
         </div>
-
-        {replies.length > 0 && (
-          <section aria-label="Replies" className="bg-cream">
-            {replies.map((r) => (
-              <ReplyCard key={r.id} reply={r} />
-            ))}
-          </section>
-        )}
-
-        <SampleReplyNotice postId={post.id} hasReplies={replies.length > 0} />
       </article>
 
       {more.length > 0 && (

@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 export const CAPTION_MAX = 80;
 const FEED_LIMIT = 30;
 
-export type LivePost = Post & { authorId: string };
+export type LivePost = Post & { authorId: string; createdAt: string };
 
 export type PostErrorKind = "network" | "no-profile" | "too-big";
 
@@ -53,6 +53,7 @@ function toLivePost(row: PostRow): LivePost {
   return {
     id: row.id,
     authorId: row.author_id,
+    createdAt: row.created_at,
     author: row.author?.handle ?? "unknown",
     authorName: row.author?.display_name,
     plaza: row.plaza,
