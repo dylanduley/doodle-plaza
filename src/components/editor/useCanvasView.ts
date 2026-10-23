@@ -79,18 +79,18 @@ export function useCanvasView() {
   // Clamp pan so the canvas edge never goes past the window edge.
   // If the canvas fits on an axis, it stays centered on that axis.
   const clampPan = useCallback((v: View): View => {
-    const win = getWindow();
-    const canvas = win?.querySelector("canvas");
-    if (!win || !canvas) return v;
+    const stage = viewportRef.current;
+    const canvas = getWindow()?.querySelector("canvas");
+    if (!stage || !canvas) return v;
     const rad = (v.rotation * Math.PI) / 180;
     const cos = Math.abs(Math.cos(rad));
     const sin = Math.abs(Math.sin(rad));
-    const cw = canvas.offsetWidth * v.zoom;
-    const ch = canvas.offsetHeight * v.zoom;
-    const halfBoxW = (cw * cos + ch * sin) / 2;
-    const halfBoxH = (cw * sin + ch * cos) / 2;
-    const limitX = Math.max(0, halfBoxW - win.clientWidth / 2);
-    const limitY = Math.max(0, halfBoxH - win.clientHeight / 2);
+    const boxW = (canvas.offsetWidth * cos + canvas.offsetHeight * sin) * v.zoom;
+    const boxH = (canvas.offsetWidth * sin + canvas.offsetHeight * cos) * v.zoom;
+    const winW = Math.min(stage.clientWidth - 32, boxW);
+    const winH = Math.min(stage.clientHeight - 32, boxH);
+    const limitX = Math.max(0, (boxW - winW) / 2);
+    const limitY = Math.max(0, (boxH - winH) / 2);
     const panX = clamp(v.panX, -limitX, limitX);
     const panY = clamp(v.panY, -limitY, limitY);
     const unchanged =
@@ -172,6 +172,8 @@ export function useCanvasView() {
     if (!el) return;
     const observer = new ResizeObserver(() => setView((v) => clampPan(v)));
     observer.observe(el);
+    const win = el.querySelector("[data-canvas-window]");
+    if (win) observer.observe(win);
     return () => observer.disconnect();
   }, [clampPan]);
 
@@ -204,7 +206,10 @@ export function useCanvasView() {
 
       const now = performance.now();
       if (!latch || now > latch.until) {
-        latch = { target: canX || canY ? "canvas" : "page", until: 0 };
+        const r = el.querySelector("[data-canvas-window]")?.getBoundingClientRect();
+        const over =
+          !!r && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        latch = { target: over && (canX || canY) ? "canvas" : "page", until: 0 };
       }
       latch.until = now + LATCH_MS;
 
@@ -319,7 +324,7 @@ export function useCanvasView() {
     };
   }, [rotateBy, zoomBy, reset, nudge, toggleFlip]);
 
-  const transform = `translate(-50%, -50%) translate(${view.panX}px, ${view.panY}px) rotate(${view.rotation}deg) scale(${view.flipped ? -view.zoom : view.zoom}, ${view.zoom})`;
+  const transform = `translate(-50%, -50%) translate(${view.panX}px, ${view.panY}px) scale(${view.flipped ? -1 : 1}, 1) rotate(${view.rotation}deg) scale(${view.zoom})`;
   const overflow = {
     up: view.panY < view.limitY - 0.5,
     down: view.panY > -view.limitY + 0.5,

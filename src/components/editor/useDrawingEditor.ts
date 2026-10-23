@@ -145,9 +145,9 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
     const dx = e.clientX - (rect.left + rect.width / 2);
     const dy = e.clientY - (rect.top + rect.height / 2);
     const rad = (-rotation * Math.PI) / 180;
-    const rx = dx * Math.cos(rad) - dy * Math.sin(rad);
-    const lx = flipped ? -rx : rx;
-    const ly = dx * Math.sin(rad) + dy * Math.cos(rad);
+    const fx = flipped ? -dx : dx;
+    const lx = fx * Math.cos(rad) - dy * Math.sin(rad);
+    const ly = fx * Math.sin(rad) + dy * Math.cos(rad);
     const screenPxPerPixel = (canvas.offsetWidth * zoom) / width;
     return {
       x: Math.floor(lx / screenPxPerPixel + width / 2),

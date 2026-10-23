@@ -8,6 +8,7 @@ export function Tile({
   pressed,
   disabled,
   small,
+  className,
   onClick,
   children,
 }: {
@@ -16,13 +17,14 @@ export function Tile({
   pressed?: boolean;
   disabled?: boolean;
   small?: boolean;
+  className?: string;
   onClick: () => void;
   children: ReactNode;
 }) {
   return (
     <button
       type="button"
-      className={small ? "tile tile-small" : "tile"}
+      className={[small ? "tile tile-small" : "tile", className].filter(Boolean).join(" ")}
       aria-label={label}
       title={badge ? `${label} (${badge})` : label}
       aria-pressed={pressed}

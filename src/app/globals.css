@@ -59,7 +59,7 @@ body {
 
   /* Translucent tray that groups related buttons */
   .tray {
-    @apply flex items-center gap-1.5 rounded-2xl p-1.5;
+    @apply flex flex-wrap items-center gap-1.5 rounded-2xl p-1.5;
     background: rgb(255 255 255 / 0.18);
   }
 
@@ -176,7 +176,6 @@ body {
   /* Fixed window the canvas is seen through; clips it when zoomed in */
   .canvas-window {
     @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden rounded-md;
-    container-type: size;
     /* Checker shows "off the paper" around a canvas turned sideways */
     background: repeating-conic-gradient(rgb(255 255 255 / 0.16) 0 25%, transparent 0 50%) 0 0 / 14px 14px;
     box-shadow: 0 4px 0 0 rgb(0 0 0 / 0.25);
