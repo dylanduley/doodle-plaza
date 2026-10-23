@@ -51,6 +51,10 @@ body {
     background-size: 22px 22px;
     background-position: 0 0, 11px 11px;
     box-shadow: 0 5px 0 0 var(--color-leaf-shadow);
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Translucent tray that groups related buttons */
@@ -172,6 +176,7 @@ body {
   /* Fixed window the canvas is seen through; clips it when zoomed in */
   .canvas-window {
     @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden rounded-md;
+    container-type: size;
     /* Checker shows "off the paper" around a canvas turned sideways */
     background: repeating-conic-gradient(rgb(255 255 255 / 0.16) 0 25%, transparent 0 50%) 0 0 / 14px 14px;
     box-shadow: 0 4px 0 0 rgb(0 0 0 / 0.25);
@@ -226,6 +231,9 @@ body {
 
   .viewport-compact {
     aspect-ratio: 16 / 10;
+  }
+  .viewport-tall {
+    max-height: 80svh;
   }
   @media (min-width: 1024px) {
     .viewport-compact {

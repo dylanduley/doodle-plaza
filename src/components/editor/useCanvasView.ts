@@ -117,19 +117,11 @@ export function useCanvasView() {
     });
   }, [clampPan]);
 
-  // Quarter turn + refit, otherwise a sideways wide canvas is mostly offscreen.
   const rotateBy = useCallback(
     (deg: number) => {
-      const win = viewportRef.current?.querySelector<HTMLElement>("[data-canvas-window]");
-      const canvas = win?.querySelector("canvas");
       setView((prev) => {
         const rotation = normalizeAngle(prev.rotation + deg);
-        let fitZoom = 1;
-        if (win && canvas && Math.abs(rotation) % 180 === 90) {
-          // Sideways: the canvas's width now runs vertically, and vice versa.
-          fitZoom = Math.min(1, win.clientHeight / canvas.offsetWidth, win.clientWidth / canvas.offsetHeight);
-        }
-        return clampPan({ ...prev, rotation, fitZoom, zoom: fitZoom, panX: 0, panY: 0 });
+        return clampPan({ ...prev, rotation, fitZoom: 1, zoom: 1, panX: 0, panY: 0 });
       });
     },
     [clampPan],
@@ -220,13 +212,21 @@ export function useCanvasView() {
       e.preventDefault();
       if (canX || canY) panBy(canX ? dx : 0, canY ? dy : 0);
     };
+    const onTouch = (e: TouchEvent) => {
+      const t = e.target as Element | null;
+      if (t?.closest("[data-canvas-window]") && !t.closest("button")) e.preventDefault();
+    };
     // React's onWheel is passive, so preventDefault needs a native listener.
     el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("touchstart", onTouch, { passive: false });
+    el.addEventListener("touchmove", onTouch, { passive: false });
     el.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", onUp);
     return () => {
       el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("touchstart", onTouch);
+      el.removeEventListener("touchmove", onTouch);
       el.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);

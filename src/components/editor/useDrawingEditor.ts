@@ -135,7 +135,7 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
     };
   }, [render]);
 
-  const stroke = useRef<{ id: number; x: number; y: number; before: Uint8Array } | null>(null);
+  const stroke = useRef<{ id: number; x: number; y: number; color: number; before: Uint8Array } | null>(null);
 
   // Screen point -> bitmap coords (undo pan/rotate/zoom).
   const toCanvasPoint = (e: { clientX: number; clientY: number }) => {
@@ -158,7 +158,9 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
   const strokeColor = tool === "eraser" ? PAPER : color;
 
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
-    if (e.pointerType === "mouse" && e.button !== 0) return;
+    // 5 = pen eraser
+    const penEraser = e.pointerType === "pen" && (e.button === 5 || (e.buttons & 32) !== 0);
+    if (e.button !== 0 && !penEraser) return;
     // Drawing is paused during playback so it's always clear which frame you're on.
     if (stroke.current || tool === "hand" || playingRef.current) return;
     const bmp = getBitmap();
@@ -166,7 +168,7 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
 
     if (tool === "fill") {
       const before = bmp.data.slice();
-      if (floodFill(bmp, x, y, color)) {
+      if (floodFill(bmp, x, y, penEraser ? PAPER : color)) {
         getFrame().history.record(before);
         requestRender();
         markChanged();
@@ -178,8 +180,9 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
       // Capture can throw if the pointer is already up.
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {}
-    stroke.current = { id: e.pointerId, x, y, before: bmp.data.slice() };
-    drawLine(bmp, x, y, x, y, brushSize, strokeColor);
+    const c = penEraser ? PAPER : strokeColor;
+    stroke.current = { id: e.pointerId, x, y, color: c, before: bmp.data.slice() };
+    drawLine(bmp, x, y, x, y, brushSize, c);
     requestRender();
   };
 
@@ -192,7 +195,7 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
     for (const sample of samples) {
       const { x, y } = toCanvasPoint(sample);
       if (x === active.x && y === active.y) continue;
-      drawLine(getBitmap(), active.x, active.y, x, y, brushSize, strokeColor);
+      drawLine(getBitmap(), active.x, active.y, x, y, brushSize, active.color);
       active.x = x;
       active.y = y;
     }

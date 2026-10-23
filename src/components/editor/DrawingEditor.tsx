@@ -68,6 +68,8 @@ export function DrawingEditor({
   };
 
   const wideCanvas = width / (height + 28) >= 2;
+  const sideways = width !== height && Math.abs(view.view.rotation) % 180 === 90;
+  const [boxW, boxH] = sideways ? [height, width] : [width, height];
   const handActive = editor.tool === "hand" || view.spaceHeld;
   const cursor = view.panning
     ? "grabbing"
@@ -178,8 +180,11 @@ export function DrawingEditor({
           <div
             ref={viewportRef}
             // Square canvases get a fixed wide stage so they don't get too tall.
-            className={wideCanvas ? "viewport" : "viewport viewport-compact"}
-            style={{ aspectRatio: wideCanvas ? width / (height + 28) : undefined, cursor }}
+            className={sideways ? "viewport viewport-tall" : wideCanvas ? "viewport" : "viewport viewport-compact"}
+            style={{
+              aspectRatio: sideways ? `${height + 40} / ${width + 28}` : wideCanvas ? width / (height + 28) : undefined,
+              cursor,
+            }}
             onPointerDown={(e) => {
               if (view.wantsPan(e, editor.tool === "hand")) view.onPanStart(e);
               // Don't paint parts of the canvas that are hidden while zoomed in.
@@ -197,6 +202,7 @@ export function DrawingEditor({
               view.onPanEnd(e);
               editor.onPointerEnd(e);
             }}
+            onContextMenu={(e) => e.preventDefault()}
             onLostPointerCapture={(e) => {
               view.onPanEnd(e);
               editor.onPointerEnd(e);
@@ -209,8 +215,8 @@ export function DrawingEditor({
               className="canvas-window"
               style={{
                 // Fit inside the stage in both directions, leaving a small margin
-                width: `min(94cqw, ${((88 * width) / height).toFixed(2)}cqh)`,
-                aspectRatio: `${width} / ${height}`,
+                width: `min(94cqw, ${((88 * boxW) / boxH).toFixed(2)}cqh)`,
+                aspectRatio: `${boxW} / ${boxH}`,
               }}
             >
               <canvas
@@ -222,6 +228,7 @@ export function DrawingEditor({
                 className="pixel-canvas absolute top-1/2 left-1/2 w-full"
                 style={{
                   aspectRatio: `${width} / ${height}`,
+                  width: sideways ? "100cqh" : undefined,
                   transform: view.transform,
                   transition: view.smooth ? "transform 200ms ease-out" : undefined,
                 }}
