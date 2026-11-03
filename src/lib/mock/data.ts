@@ -51,7 +51,7 @@ export type Reply = {
   yeahs: number;
 };
 
-// The gold card on the home and plaza pages points at this plaza. Change it when the season changes.
+// The gold card on the home page points at this plaza. Change it when the season changes.
 export const SEASON_THEME = {
   plaza: "fall-season",
   title: "It's November!",

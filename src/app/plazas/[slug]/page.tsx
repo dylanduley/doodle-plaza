@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PostsFeed } from "@/components/post/PostsFeed";
-import { EmptyState, PlazaList, SeasonCard, SectionBar } from "@/components/ui/Blocks";
+import { EmptyState, PlazaList, SectionBar } from "@/components/ui/Blocks";
 import { ClockIcon, PencilIcon } from "@/components/ui/icons";
 import { PostCard } from "@/components/ui/Post";
 import { getPlaza, plazas, postsInPlaza } from "@/lib/mock/data";
@@ -66,7 +66,6 @@ export default async function PlazaPage({ params }: Props) {
       </div>
 
       <aside className="flex flex-col gap-5" aria-label="More plazas">
-        <SeasonCard />
         <PlazaList />
       </aside>
     </div>
