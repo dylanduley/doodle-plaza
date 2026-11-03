@@ -30,6 +30,7 @@ export function PopularStrip({ samples }: { samples: Post[] }) {
         id="popular-heading"
         icon={<TrendingIcon size={20} />}
         title={showReal ? "Popular this week" : "Sample doodles"}
+        tone="berry"
       />
       <ul className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
         {showReal
@@ -59,8 +60,8 @@ function LiveTile({ post }: { post: LivePost }) {
         : null;
 
   return (
-    <Link href={`/p/${post.id}`} className="tile-card group">
-      <div className="overflow-hidden rounded-xl transition-transform duration-200 group-hover:scale-[1.03]">
+    <Link href={`/p/${post.id}`} className="tile-card">
+      <div className="overflow-hidden rounded-lg">
         {image && <BitmapImage data={image.data} width={image.width} height={image.height} label={`Drawing by ${name}`} />}
       </div>
       <div className="flex items-center justify-between gap-2 px-1 pt-2 text-sm">

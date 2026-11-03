@@ -18,7 +18,7 @@ export function SampleBadge() {
   return (
     <span
       className="rounded-full border-2 border-dashed border-leaf-dark/40 px-2 py-0.5 text-xs font-bold text-leaf-dark"
-      title="An example post by Pip, the plaza mascot"
+      title="An example post to show what the plaza looks like"
     >
       Sample
     </span>
@@ -108,7 +108,7 @@ export function PostCard({
         // Animations have their own play/pause button, which can't sit inside a link.
         <PostBodyView body={post.body} label={label} />
       ) : (
-        <Link href={`/p/${post.id}`} className="block rounded-2xl" aria-label={`Open post: ${label}`}>
+        <Link href={`/p/${post.id}`} className="block rounded-lg" aria-label={`Open post: ${label}`}>
           <PostBodyView body={post.body} label={label} />
         </Link>
       )}
@@ -134,13 +134,12 @@ export function DoodleTile({ post }: { post: Post }) {
   if (post.body.type !== "drawing") return null;
   const user = getUser(post.author);
   return (
-    <Link href={`/p/${post.id}`} className="tile-card group">
-      <div className="overflow-hidden rounded-xl">
+    <Link href={`/p/${post.id}`} className="tile-card">
+      <div className="overflow-hidden rounded-lg">
         <DoodleImage
           kind={post.body.kind}
           seed={post.body.seed}
           label={`Drawing by ${user?.name}`}
-          className="transition-transform duration-200 group-hover:scale-[1.03]"
         />
       </div>
       <div className="flex items-center justify-between gap-2 px-1 pt-2 text-sm">

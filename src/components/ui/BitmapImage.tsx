@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { decodeBitmap } from "@/lib/pixel/codec";
 import { paintBitmap } from "@/lib/pixel/paint";
 
@@ -30,6 +30,19 @@ export function BitmapImage({
     if (bitmap) paintBitmap(ref.current, bitmap);
   }, [bitmap]);
 
+  // When shown smaller than its real size (avatars, thumbnails), crisp scaling drops whole
+  // rows and columns and thin lines disappear. Smooth it then, keep it crisp when enlarged.
+  const [shrunk, setShrunk] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !bitmap) return;
+    const update = () => setShrunk(el.getBoundingClientRect().width < bitmap.width - 0.5);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [bitmap]);
+
   if (!bitmap) {
     return (
       <div
@@ -51,7 +64,10 @@ export function BitmapImage({
       role="img"
       aria-label={label}
       className="pixel-canvas block w-full bg-white"
-      style={{ aspectRatio: `${bitmap.width} / ${bitmap.height}` }}
+      style={{
+        aspectRatio: `${bitmap.width} / ${bitmap.height}`,
+        imageRendering: shrunk ? "auto" : undefined,
+      }}
     />
   );
 }

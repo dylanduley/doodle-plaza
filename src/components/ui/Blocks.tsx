@@ -1,22 +1,23 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { DAILY_PROMPT, type Plaza, plazas, postsInPlaza } from "@/lib/mock/data";
-import { ArrowRightIcon, CalendarIcon, PencilIcon, PlazasIcon } from "./icons";
-import { Mascot } from "./Mascot";
+import { getPlaza, type Plaza, plazas, postsInPlaza, SEASON_THEME } from "@/lib/mock/data";
+import { ArrowRightIcon, PencilIcon, PlazasIcon } from "./icons";
 
 export function SectionBar({
   icon,
   title,
   action,
   id,
+  tone = "leaf",
 }: {
   icon: ReactNode;
   title: string;
   action?: ReactNode;
   id?: string;
+  tone?: "leaf" | "sky" | "berry";
 }) {
   return (
-    <div className="section-bar">
+    <div className={tone === "leaf" ? "section-bar" : `section-bar section-bar-${tone}`}>
       <span aria-hidden className="shrink-0">
         {icon}
       </span>
@@ -29,22 +30,27 @@ export function SectionBar({
   );
 }
 
-export function PromptCard() {
+export function SeasonCard() {
+  const plaza = getPlaza(SEASON_THEME.plaza);
   return (
-    <section aria-labelledby="prompt-heading" className="prompt-card">
+    <section aria-labelledby="season-heading" className="season-card">
       <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest">
-        <CalendarIcon size={15} /> Today&apos;s prompt
+        <span aria-hidden>{plaza?.emoji}</span> This season
       </p>
-      <h2 id="prompt-heading" className="font-display text-3xl leading-tight">
-        {DAILY_PROMPT.title}
+      <h2 id="season-heading" className="font-black tracking-tight text-3xl leading-tight">
+        {SEASON_THEME.title}
       </h2>
-      <p className="text-sm">{DAILY_PROMPT.hint}</p>
-      <Link
-        href={`/draw?prompt=${encodeURIComponent(DAILY_PROMPT.title)}`}
-        className="btn btn-dark mt-1 self-start"
-      >
-        <PencilIcon size={18} /> Draw it
-      </Link>
+      <p className="text-sm">{SEASON_THEME.hint}</p>
+      <div className="mt-1 flex flex-wrap gap-2">
+        <Link href={`/draw?plaza=${SEASON_THEME.plaza}`} className="btn btn-dark">
+          <PencilIcon size={18} /> Draw it
+        </Link>
+        {plaza && (
+          <Link href={`/plazas/${plaza.slug}`} className="btn">
+            See the plaza
+          </Link>
+        )}
+      </div>
     </section>
   );
 }
@@ -86,9 +92,8 @@ export function PlazaList() {
 export function AboutCard() {
   return (
     <section className="card flex gap-3 p-4">
-      <Mascot size={44} className="shrink-0" />
       <div className="text-sm">
-        <h2 className="font-extrabold">Hi, I&apos;m Pip!</h2>
+        <h2 className="font-extrabold">Welcome to the plaza!</h2>
         <p className="mt-1 text-muted">
           Everything in the plaza is hand-drawn, so no pressure, just have fun exploring and make cool art!
         </p>
@@ -100,7 +105,7 @@ export function AboutCard() {
 export function PlazaCard({ plaza }: { plaza: Plaza }) {
   const count = postsInPlaza(plaza.slug).length;
   return (
-    <Link href={`/plazas/${plaza.slug}`} className="card group flex w-full flex-col gap-3 p-5 transition-transform hover:-translate-y-0.5">
+    <Link href={`/plazas/${plaza.slug}`} className="card group flex w-full flex-col gap-3 p-5">
       <div className="flex items-center gap-3">
         <span aria-hidden className="emoji-badge emoji-badge-lg">
           {plaza.emoji}
@@ -111,7 +116,7 @@ export function PlazaCard({ plaza }: { plaza: Plaza }) {
             {count} {count === 1 ? "post" : "posts"}
           </p>
         </div>
-        <ArrowRightIcon size={20} className="ml-auto text-leaf-dark transition-transform group-hover:translate-x-1" />
+        <ArrowRightIcon size={20} className="ml-auto text-leaf-dark" />
       </div>
       <p className="text-sm">{plaza.description}</p>
     </Link>
@@ -121,8 +126,7 @@ export function PlazaCard({ plaza }: { plaza: Plaza }) {
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="card flex flex-col items-center gap-3 px-6 py-10 text-center">
-      <Mascot size={64} />
-      <h3 className="font-display text-2xl">{title}</h3>
+      <h3 className="font-black tracking-tight text-2xl">{title}</h3>
       {children && <div className="max-w-sm text-muted">{children}</div>}
     </div>
   );

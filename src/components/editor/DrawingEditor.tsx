@@ -1,8 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { type ConfirmRequest, ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { Bitmap } from "@/lib/pixel/bitmap";
 import { BRUSH_SIZES, CANVAS_HEIGHT, CANVAS_WIDTH, PALETTE } from "@/lib/pixel/constants";
+import { clearDraft, type DraftKey, loadDraft, placeCentered, saveDraft } from "@/lib/pixel/drafts";
 import {
   DownloadIcon,
   EraserIcon,
@@ -31,6 +33,10 @@ export type EditorApi = {
   getFrames: () => Bitmap[];
   fps: number;
   animated: boolean;
+  /** True when the drawing is safely saved in this browser (drafts only). */
+  draftSaved: boolean;
+  /** Call after posting so the next visit starts blank. */
+  clearDraft: () => void;
 };
 
 type Props = {
@@ -40,6 +46,10 @@ type Props = {
   animated?: boolean;
   /** only read on mount */
   initial?: Bitmap;
+  /** Auto-save to this browser under this key, and restore it on the next visit. */
+  draftKey?: DraftKey;
+  /** If there's no draft yet, start from this other draft (e.g. a still drawing as frame 1). */
+  seedFrom?: DraftKey;
 };
 
 const SIZE_ICON = [14, 19, 25] as const;
@@ -51,10 +61,58 @@ export function DrawingEditor({
   footer,
   animated = false,
   initial,
+  draftKey,
+  seedFrom,
 }: Props) {
   // Refs kept separate from render data (React Compiler lint).
   const { viewportRef, viewRef, ...view } = useCanvasView();
   const { canvasRef, ...editor } = useDrawingEditor({ width, height, viewRef, animated, initial });
+  const { replaceFrames, getFrames } = editor;
+
+  // Drafts: restore after mount (localStorage isn't available during server render),
+  // then save shortly after every change.
+  const draftReady = useRef(!draftKey);
+  const [draftSaved, setDraftSaved] = useState(false);
+  useEffect(() => {
+    if (!draftKey) return;
+    const size = { width, height };
+    const draft = loadDraft(draftKey, size);
+    if (draft) {
+      replaceFrames(draft.frames, draft.fps);
+    } else if (seedFrom) {
+      const seed = loadDraft(seedFrom, { width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
+      if (seed) replaceFrames([placeCentered(seed.frames[0], width, height)]);
+    }
+    draftReady.current = true;
+  }, [draftKey, seedFrom, width, height, replaceFrames]);
+
+  const framesVersion = editor.frames.map((f) => `${f.id}:${f.rev}`).join(",");
+  useEffect(() => {
+    if (!draftKey || !draftReady.current) return;
+    const t = setTimeout(() => setDraftSaved(saveDraft(draftKey, getFrames(), editor.fps)), 400);
+    return () => clearTimeout(t);
+  }, [draftKey, framesVersion, editor.fps, getFrames]);
+
+  const forgetDraft = useCallback(() => {
+    if (draftKey) clearDraft(draftKey);
+  }, [draftKey]);
+
+  // "Are you sure?" before throwing drawing away
+  const [confirm, setConfirm] = useState<ConfirmRequest | null>(null);
+  const askClear = () =>
+    setConfirm({
+      title: animated ? "Clear this frame?" : "Clear your drawing?",
+      message: "You can still undo this with Undo.",
+      confirmLabel: "Clear",
+      onConfirm: editor.clear,
+    });
+  const askDeleteFrame = () =>
+    setConfirm({
+      title: `Delete frame ${editor.current + 1}?`,
+      message: "You can bring it back with Undo right after.",
+      confirmLabel: "Delete frame",
+      onConfirm: editor.deleteFrame,
+    });
 
   const download = async () => {
     const blob = await editor.toPngBlob(4);
@@ -296,7 +354,7 @@ export function DrawingEditor({
               <Tile
                 small
                 label={animated ? "Clear this frame" : "Clear canvas"}
-                onClick={editor.clear}
+                onClick={askClear}
                 disabled={editor.blank}
               >
                 <TrashIcon size={22} />
@@ -323,7 +381,7 @@ export function DrawingEditor({
             canRestoreFrame={editor.canRestoreFrame}
             onSelect={editor.goToFrame}
             onAdd={editor.addFrame}
-            onDelete={editor.deleteFrame}
+            onDelete={askDeleteFrame}
             onRestore={editor.restoreFrame}
             onMove={editor.moveFrame}
             onTogglePlay={editor.togglePlay}
@@ -345,7 +403,11 @@ export function DrawingEditor({
         getFrames: editor.getFrames,
         fps: editor.fps,
         animated,
+        draftSaved: !!draftKey && draftSaved,
+        clearDraft: forgetDraft,
       })}
+
+      <ConfirmDialog request={confirm} onClose={() => setConfirm(null)} />
     </div>
   );
 }

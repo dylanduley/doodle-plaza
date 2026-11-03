@@ -14,7 +14,7 @@ export default async function MakeProfilePage({ searchParams }: Props) {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="font-display text-4xl text-leaf-deep">Make your profile</h1>
+        <h1 className="page-title">Make your profile</h1>
         <p className="mt-1 max-w-xl text-muted">
           Everything here is drawn, including you. Draw your profile picture on the{" "}
           {PROFILE_PICTURE_SIZE}×{PROFILE_PICTURE_SIZE} canvas, then pick a name.

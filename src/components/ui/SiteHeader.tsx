@@ -6,10 +6,10 @@ import { PROFILE_PICTURE_SIZE } from "@/lib/pixel/constants";
 import { useMyProfile } from "@/lib/useMyProfile";
 import { BitmapImage } from "./BitmapImage";
 import { HomeIcon, PencilIcon, PlazasIcon, SignInIcon } from "./icons";
-import { Mascot } from "./Mascot";
+import { Logo } from "./Logo";
 
 const NAV = [
-  { href: "/", label: "Plaza", icon: HomeIcon, match: (p: string) => p === "/" },
+  { href: "/", label: "Home", icon: HomeIcon, match: (p: string) => p === "/" },
   { href: "/plazas", label: "Plazas", icon: PlazasIcon, match: (p: string) => p.startsWith("/plazas") },
   { href: "/draw", label: "Draw", icon: PencilIcon, match: (p: string) => p.startsWith("/draw") },
 ];
@@ -18,9 +18,9 @@ export function SiteHeader() {
   const pathname = usePathname();
   return (
     <header className="site-header">
-      <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2.5 sm:gap-4">
-        <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Doodle Plaza home">
-          <Mascot size={36} />
+      <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 pt-2.5 pb-4 sm:gap-4">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Doodle Plaza home">
+          <Logo size={30} className="text-white drop-shadow-[2px_2px_0_var(--color-header-shadow)]" />
           <span className="logo-text hidden text-2xl sm:inline">Doodle Plaza</span>
         </Link>
 
@@ -69,7 +69,7 @@ function ProfileLink({ pathname }: { pathname: string }) {
       title={`@${profile.handle}`}
       aria-label={`Your profile, @${profile.handle}`}
     >
-      <span className="block size-8 overflow-hidden rounded-lg border-2 border-white bg-white">
+      <span className="block size-8 shrink-0 overflow-hidden rounded-md border-2 border-white bg-white">
         <BitmapImage
           data={profile.avatar}
           width={PROFILE_PICTURE_SIZE}

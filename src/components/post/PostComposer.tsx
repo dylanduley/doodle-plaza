@@ -11,12 +11,14 @@ import { useMyProfile } from "@/lib/useMyProfile";
 
 type Props = {
   animated?: boolean;
+  /** Animations only: start frame 1 from the saved still drawing. */
+  fromStill?: boolean;
   defaultPlaza?: string;
   /** For testing the error state. */
   simulateError?: boolean;
 };
 
-export function PostComposer({ animated = false, ...props }: Props) {
+export function PostComposer({ animated = false, fromStill = false, ...props }: Props) {
   return (
     <>
       <ProfileNeededNotice next={animated ? "/draw/animate" : "/draw"} />
@@ -24,6 +26,8 @@ export function PostComposer({ animated = false, ...props }: Props) {
         animated={animated}
         width={animated ? ANIMATION_WIDTH : CANVAS_WIDTH}
         height={animated ? ANIMATION_HEIGHT : CANVAS_HEIGHT}
+        draftKey={animated ? "animation" : "still"}
+        seedFrom={animated && fromStill ? "still" : undefined}
         footer={(api) => <ComposerForm api={api} {...props} />}
       />
     </>
@@ -59,7 +63,8 @@ function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props &
   const charsLeft = CAPTION_MAX - caption.length;
 
   useEffect(() => {
-    if (api.blank || status.state === "posted") return;
+    // Saved drafts survive leaving the page, so only warn if saving didn't work.
+    if (api.blank || api.draftSaved || status.state === "posted") return;
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       // Older Safari only shows the prompt when returnValue is set.
@@ -67,7 +72,7 @@ function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props &
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [api.blank, status.state]);
+  }, [api.blank, api.draftSaved, status.state]);
 
   async function submit(e?: SubmitEvent<HTMLFormElement>) {
     e?.preventDefault();
@@ -88,6 +93,7 @@ function ComposerForm({ api, defaultPlaza = "", simulateError = false }: Props &
         { simulateNetworkError },
       );
       setStatus({ state: "posted" });
+      api.clearDraft();
       router.push(`/p/${post.id}?posted=1`);
     } catch (err) {
       setStatus({

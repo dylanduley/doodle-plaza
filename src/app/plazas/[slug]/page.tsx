@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PostsFeed } from "@/components/post/PostsFeed";
-import { EmptyState, PlazaList, PromptCard, SectionBar } from "@/components/ui/Blocks";
+import { EmptyState, PlazaList, SeasonCard, SectionBar } from "@/components/ui/Blocks";
 import { ClockIcon, PencilIcon } from "@/components/ui/icons";
 import { PostCard } from "@/components/ui/Post";
 import { getPlaza, plazas, postsInPlaza } from "@/lib/mock/data";
@@ -29,7 +29,7 @@ export default async function PlazaPage({ params }: Props) {
       <div className="flex min-w-0 flex-col gap-6">
         <section className="film">
           <div className="flex flex-wrap items-center gap-4">
-            <span aria-hidden className="grid size-16 place-items-center rounded-2xl bg-cream text-4xl">
+            <span aria-hidden className="grid size-16 place-items-center rounded-lg bg-cream text-4xl">
               {plaza.emoji}
             </span>
             <div className="min-w-0 flex-1">
@@ -40,7 +40,7 @@ export default async function PlazaPage({ params }: Props) {
               <PencilIcon size={18} /> Draw here
             </Link>
           </div>
-          <p className="mt-4 max-w-2xl rounded-xl bg-cream px-4 py-3 text-ink">{plaza.description}</p>
+          <p className="mt-4 max-w-2xl rounded-lg bg-cream px-4 py-3 text-ink">{plaza.description}</p>
         </section>
 
         <section className="flex flex-col gap-4" aria-labelledby="plaza-feed-heading">
@@ -66,7 +66,7 @@ export default async function PlazaPage({ params }: Props) {
       </div>
 
       <aside className="flex flex-col gap-5" aria-label="More plazas">
-        <PromptCard />
+        <SeasonCard />
         <PlazaList />
       </aside>
     </div>

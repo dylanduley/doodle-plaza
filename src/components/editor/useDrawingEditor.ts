@@ -138,20 +138,24 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
   const stroke = useRef<{ id: number; x: number; y: number; color: number; before: Uint8Array } | null>(null);
 
   // Screen point -> bitmap coords (undo pan/rotate/zoom).
+  // Uses the on-screen box (fractional, includes zoom) rather than offsetWidth, which rounds.
   const toCanvasPoint = (e: { clientX: number; clientY: number }) => {
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
-    const { zoom, rotation, flipped } = viewRef.current;
+    const { rotation, flipped } = viewRef.current;
     const dx = e.clientX - (rect.left + rect.width / 2);
     const dy = e.clientY - (rect.top + rect.height / 2);
     const rad = (-rotation * Math.PI) / 180;
     const fx = flipped ? -dx : dx;
     const lx = fx * Math.cos(rad) - dy * Math.sin(rad);
     const ly = fx * Math.sin(rad) + dy * Math.cos(rad);
-    const screenPxPerPixel = (canvas.offsetWidth * zoom) / width;
+    // a quarter turn swaps which screen side is the canvas width
+    const sideways = Math.abs(Math.round(rotation / 90)) % 2 === 1;
+    const screenW = sideways ? rect.height : rect.width;
+    const screenH = sideways ? rect.width : rect.height;
     return {
-      x: Math.floor(lx / screenPxPerPixel + width / 2),
-      y: Math.floor(ly / screenPxPerPixel + height / 2),
+      x: Math.floor((lx / screenW) * width + width / 2),
+      y: Math.floor((ly / screenH) * height + height / 2),
     };
   };
 
@@ -336,6 +340,22 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
     publish();
   }, [requestRender, publish]);
 
+  /** Swap in saved frames (e.g. a restored draft). Starts a fresh undo history. */
+  const replaceFrames = useCallback(
+    (bitmaps: Bitmap[], nextFps?: number) => {
+      if (stroke.current || bitmaps.length === 0) return;
+      stopPlaying();
+      framesRef.current = bitmaps.slice(0, MAX_FRAMES).map((b) => newFrame(width, height, cloneBitmap(b)));
+      currentRef.current = 0;
+      deletedRef.current = null;
+      setCanRestoreFrame(false);
+      if (nextFps && (FPS_OPTIONS as readonly number[]).includes(nextFps)) setFps(nextFps as Fps);
+      requestRender();
+      publish();
+    },
+    [width, height, stopPlaying, requestRender, publish],
+  );
+
   const moveFrame = useCallback(
     (direction: -1 | 1) => {
       const list = framesRef.current;
@@ -441,6 +461,7 @@ export function useDrawingEditor({ width, height, viewRef, animated = false, ini
     toPngBlob,
     getBitmap,
     getFrames,
+    replaceFrames,
     // animation
     frames,
     current,

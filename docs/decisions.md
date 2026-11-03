@@ -74,9 +74,9 @@ Each entry records what was decided, the alternatives, and why. Add new entries 
 
 ## 10. Site look: a sunny town square, not a dark social app
 
-**Decision:** A bright green, chunky, friendly visual style: banner panels strung with pixel festival bunting, rounded "paving stone" background, big pill buttons with a pressed-down shadow, a pixel turtle mascot (Pip, drawn by me), Pixelify Sans for headings and Nunito for body text.
+**Decision:** A bright green, chunky, friendly visual style (with a seasonal burnt-orange header for fall): banner panels strung with pixel festival bunting, graph-paper background, big pill buttons with a pressed-down shadow, Pixelify Sans only for the logo, Nunito for headings and body text (easier to read).
 
-**Inspiration:** Sudomemo (green section bars, chunky buttons) and the Miiverse archive (a calm column of post cards with who / where / when / reactions). The goal was the feeling, not a copy: original mascot, colors, and layout. An early version used film-strip perforations on the banners; they were swapped for bunting because they were too close to the reference, and bunting fits the "town square" idea better.
+**Inspiration:** Sudomemo (green section bars, chunky buttons) and the Miiverse archive (a calm column of post cards with who / where / when / reactions). The goal was the feeling, not a copy: original logo, colors, and layout. An early version used film-strip perforations on the banners; they were swapped for bunting because they were too close to the reference, and bunting fits the "town square" idea better.
 
 **Why:** The product is about low-pressure, playful posting. The UI should feel like a toy, not a dashboard, so people aren't intimidated into lurking.
 

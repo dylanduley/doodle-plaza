@@ -8,18 +8,18 @@ import { ANIMATION_HEIGHT, ANIMATION_WIDTH } from "@/lib/pixel/constants";
 export const metadata: Metadata = { title: "Animate" };
 
 type Props = {
-  searchParams: Promise<{ plaza?: string; simulateError?: string }>;
+  searchParams: Promise<{ plaza?: string; from?: string; simulateError?: string }>;
 };
 
 export default async function AnimatePage({ searchParams }: Props) {
-  const { plaza: plazaSlug, simulateError } = await searchParams;
+  const { plaza: plazaSlug, from, simulateError } = await searchParams;
   const plaza = plazaSlug ? getPlaza(plazaSlug) : undefined;
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-4xl text-leaf-deep">New animation</h1>
+          <h1 className="page-title">New animation</h1>
           <p className="mt-1 max-w-xl text-muted">
             A {ANIMATION_WIDTH}×{ANIMATION_HEIGHT} flipbook. Draw a frame, add the next one, and the
             faded previous frame helps you line things up.
@@ -35,7 +35,12 @@ export default async function AnimatePage({ searchParams }: Props) {
           </Link>
         )}
       </div>
-      <PostComposer animated defaultPlaza={plaza?.slug} simulateError={simulateError === "1"} />
+      <PostComposer
+        animated
+        fromStill={from === "still"}
+        defaultPlaza={plaza?.slug}
+        simulateError={simulateError === "1"}
+      />
     </div>
   );
 }

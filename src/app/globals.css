@@ -16,6 +16,9 @@
   --color-leaf-deep: #2f6b20;
   --color-leaf-light: #e3f4d7;
   --color-sun: #ffd43b;
+  /* Header: burnt orange for fall. White text on it is 4.5:1 (WCAG AA) */
+  --color-header: #c85014;
+  --color-header-shadow: #8f3a0e;
   --font-display: var(--font-pixel), ui-monospace, monospace;
   --font-sans: var(--font-body), ui-rounded, ui-sans-serif, system-ui, sans-serif;
 }
@@ -26,10 +29,26 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Rounded-square checker background */
+/* Sketchbook graph paper, warmed up a little to go with the orange header */
 body {
-  background-color: #e9f3e1;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Crect x='4' y='4' width='28' height='28' rx='8' fill='%23dcecd0'/%3E%3Crect x='40' y='40' width='28' height='28' rx='8' fill='%23dcecd0'/%3E%3C/svg%3E");
+  background-color: #fdf4ea;
+  background-image:
+    linear-gradient(rgb(200 80 20 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(200 80 20 / 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: -1px -1px;
+}
+
+/* Soft sky wash at the top of the window, fading into the graph paper.
+   A fixed ::before instead of background-attachment: fixed, which iOS ignores. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* see-through so the grid still shows under it */
+  background: linear-gradient(rgb(196 222 245 / 0.5), transparent 45%);
 }
 
 /* Keep pixels crisp when the small canvas is scaled up. */
@@ -43,14 +62,14 @@ body {
   /* Editor frame */
 
   .editor-frame {
-    @apply rounded-[28px] p-3 sm:p-4;
+    @apply rounded-xl p-3 sm:p-4;
     background-color: var(--color-frame);
     background-image:
       radial-gradient(rgb(255 255 255 / 0.13) 2px, transparent 2.5px),
       radial-gradient(rgb(255 255 255 / 0.07) 2px, transparent 2.5px);
     background-size: 22px 22px;
     background-position: 0 0, 11px 11px;
-    box-shadow: 0 5px 0 0 var(--color-leaf-shadow);
+    box-shadow: 0 3px 0 0 var(--color-leaf-shadow);
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
@@ -59,13 +78,13 @@ body {
 
   /* Translucent tray that groups related buttons */
   .tray {
-    @apply flex flex-wrap items-center gap-1.5 rounded-2xl p-1.5;
+    @apply flex flex-wrap items-center gap-1.5 rounded-xl p-1.5;
     background: rgb(255 255 255 / 0.18);
   }
 
   /* Dark square tool tile */
   .tile {
-    @apply relative grid size-14 shrink-0 place-items-center rounded-2xl bg-ink text-white;
+    @apply relative grid size-14 shrink-0 place-items-center rounded-xl bg-ink text-white;
     transition: transform 80ms ease, background-color 120ms ease;
   }
   .tile-small {
@@ -143,7 +162,7 @@ body {
 
   /* Horizontal, scrollable strip of frame thumbnails */
   .frame-strip {
-    @apply flex gap-2 overflow-x-auto rounded-2xl p-2;
+    @apply flex gap-2 overflow-x-auto rounded-lg p-2;
     background: rgb(47 107 32 / 0.32);
     scrollbar-width: thin;
   }
@@ -166,7 +185,7 @@ body {
 
   /* Drawing area */
   .viewport {
-    @apply relative w-full flex-1 overflow-hidden rounded-2xl select-none;
+    @apply relative w-full flex-1 overflow-hidden rounded-lg select-none;
     /* Swiping on the margins scrolls the page; only the canvas captures touch. */
     touch-action: pan-y;
     background: rgb(47 107 32 / 0.32);
@@ -252,6 +271,11 @@ body {
 
 /* Site UI */
 
+@keyframes hero-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
 @keyframes pop {
   0% { transform: scale(1); }
   40% { transform: scale(1.35) rotate(-8deg); }
@@ -263,14 +287,33 @@ body {
 
   .site-header {
     @apply sticky top-0 z-20 text-white;
-    background-color: var(--color-leaf);
-    background-image: repeating-conic-gradient(rgb(255 255 255 / 0.07) 0 25%, transparent 0 50%);
-    background-size: 24px 24px;
-    border-bottom: 4px solid rgb(255 255 255 / 0.75);
-    box-shadow: 0 3px 0 rgb(37 96 26 / 0.35);
+    background-color: var(--color-header);
+    /* faint pixel leaves for fall, over a soft lighter top */
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='56' shape-rendering='crispEdges'%3E%3Cg opacity='0.35'%3E%3Crect x='16' y='8' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='12' y='10' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='16' y='10' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='20' y='10' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='10' y='12' width='14' height='2' fill='%23ffd43b'/%3E%3Crect x='12' y='14' width='10' height='2' fill='%23ffd43b'/%3E%3Crect x='10' y='16' width='14' height='2' fill='%23ffd43b'/%3E%3Crect x='16' y='18' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='16' y='20' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='66' y='30' width='4' height='2' fill='%23f9a25a'/%3E%3Crect x='64' y='32' width='8' height='2' fill='%23f9a25a'/%3E%3Crect x='62' y='34' width='8' height='2' fill='%23f9a25a'/%3E%3Crect x='62' y='36' width='6' height='2' fill='%23f9a25a'/%3E%3Crect x='62' y='38' width='2' height='2' fill='%23f9a25a'/%3E%3Crect x='106' y='10' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='104' y='12' width='6' height='2' fill='%23ffd43b'/%3E%3Crect x='106' y='14' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='142' y='22' width='4' height='2' fill='%238f3a0e'/%3E%3Crect x='140' y='24' width='8' height='2' fill='%238f3a0e'/%3E%3Crect x='142' y='26' width='8' height='2' fill='%238f3a0e'/%3E%3Crect x='144' y='28' width='6' height='2' fill='%238f3a0e'/%3E%3Crect x='148' y='30' width='2' height='2' fill='%238f3a0e'/%3E%3Crect x='202' y='32' width='2' height='2' fill='%23f9a25a'/%3E%3Crect x='198' y='34' width='2' height='2' fill='%23f9a25a'/%3E%3Crect x='202' y='34' width='2' height='2' fill='%23f9a25a'/%3E%3Crect x='206' y='34' width='2' height='2' fill='%23f9a25a'/%3E%3Crect x='196' y='36' width='14' height='2' fill='%23f9a25a'/%3E%3Crect x='198' y='38' width='10' height='2' fill='%23f9a25a'/%3E%3Crect x='196' y='40' width='14' height='2' fill='%23f9a25a'/%3E%3Crect x='202' y='42' width='2' height='2' fill='%23f9a25a'/%3E%3Crect x='202' y='44' width='2' height='2' fill='%23f9a25a'/%3E%3Crect x='234' y='8' width='2' height='2' fill='%238f3a0e'/%3E%3Crect x='232' y='10' width='6' height='2' fill='%238f3a0e'/%3E%3Crect x='234' y='12' width='2' height='2' fill='%238f3a0e'/%3E%3Crect x='274' y='12' width='4' height='2' fill='%23ffd43b'/%3E%3Crect x='272' y='14' width='8' height='2' fill='%23ffd43b'/%3E%3Crect x='270' y='16' width='8' height='2' fill='%23ffd43b'/%3E%3Crect x='270' y='18' width='6' height='2' fill='%23ffd43b'/%3E%3Crect x='270' y='20' width='2' height='2' fill='%23ffd43b'/%3E%3Crect x='306' y='36' width='2' height='2' fill='%238f3a0e'/%3E%3Crect x='302' y='38' width='2' height='2' fill='%238f3a0e'/%3E%3Crect x='306' y='38' width='2' height='2' fill='%238f3a0e'/%3E%3Crect x='310' y='38' width='2' height='2' fill='%238f3a0e'/%3E%3Crect x='300' y='40' width='14' height='2' fill='%238f3a0e'/%3E%3Crect x='302' y='42' width='10' height='2' fill='%238f3a0e'/%3E%3Crect x='300' y='44' width='14' height='2' fill='%238f3a0e'/%3E%3Crect x='306' y='46' width='2' height='2' fill='%238f3a0e'/%3E%3Crect x='306' y='48' width='2' height='2' fill='%238f3a0e'/%3E%3C/g%3E%3C/svg%3E"),
+      linear-gradient(rgb(255 255 255 / 0.08), transparent);
+    background-size: 320px 56px, 100% 100%;
+    /* soft shadow so the page slides under it */
+    box-shadow: 0 4px 14px rgb(143 58 14 / 0.18);
   }
+  /* Dashed cream "stitching" just above the bottom edge */
+  .site-header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 3px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, rgb(255 254 248 / 0.7) 0 10px, transparent 10px 18px);
+    pointer-events: none;
+  }
+  .site-header .logo-text {
+    @apply font-display leading-none tracking-normal;
+    text-shadow: 2px 2px 0 var(--color-header-shadow);
+  }
+  /* Big white titles on green panels. Only the header logo uses the pixel font. */
   .logo-text {
-    @apply font-display leading-none;
+    @apply font-black leading-tight tracking-tight;
     /* White text, dark green pixel shadow */
     text-shadow: 2px 2px 0 var(--color-leaf-shadow);
   }
@@ -281,22 +324,28 @@ body {
     background: rgb(255 255 255 / 0.18);
   }
   .nav-link[aria-current="page"] {
-    @apply bg-white text-leaf-dark;
+    @apply bg-white text-header;
+    box-shadow: 0 3px 0 var(--color-header-shadow);
+  }
+
+  /* Page and card headings (body font; the pixel font is only for the logo) */
+  .page-title {
+    @apply text-4xl font-black tracking-tight text-leaf-deep;
   }
 
   /* Surfaces */
 
   .card {
-    @apply rounded-3xl bg-cream;
-    border: 2px solid rgb(63 138 43 / 0.16);
-    box-shadow: 0 4px 0 rgb(63 138 43 / 0.18);
+    @apply rounded-xl bg-cream;
+    border: 2px solid rgb(37 96 26 / 0.22);
+    box-shadow: 0 3px 0 rgb(37 96 26 / 0.16);
   }
 
   /* Green panel with pixel bunting along the top */
   .film {
-    @apply relative overflow-hidden rounded-3xl px-4 pt-11 pb-7 text-white sm:px-6;
+    @apply relative overflow-hidden rounded-xl px-4 pt-11 pb-7 text-white sm:px-6;
     background: var(--color-leaf);
-    box-shadow: 0 5px 0 var(--color-leaf-shadow);
+    box-shadow: 0 3px 0 var(--color-leaf-shadow);
   }
   .film::before {
     content: "";
@@ -311,10 +360,70 @@ body {
     image-rendering: pixelated;
   }
 
+  /* Home hero: checker texture, pixel grass along the bottom, floating sparkles */
+  .hero {
+    @apply pb-12;
+    background-color: var(--color-leaf);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='14' shape-rendering='crispEdges'%3E%3Crect y='8' width='32' height='6' fill='%2325601a'/%3E%3Crect x='2' y='4' width='2' height='4' fill='%2325601a'/%3E%3Crect x='4' y='6' width='2' height='2' fill='%2325601a'/%3E%3Crect x='12' y='2' width='2' height='6' fill='%2325601a'/%3E%3Crect x='10' y='5' width='2' height='3' fill='%2325601a'/%3E%3Crect x='22' y='5' width='2' height='3' fill='%2325601a'/%3E%3Crect x='24' y='3' width='2' height='5' fill='%2325601a'/%3E%3Crect x='28' y='6' width='2' height='2' fill='%2325601a'/%3E%3C/svg%3E"),
+      repeating-conic-gradient(rgb(255 255 255 / 0.06) 0 25%, transparent 0 50%);
+    background-repeat: repeat-x, repeat;
+    background-position: left bottom, 0 0;
+    background-size: 32px 14px, 28px 28px;
+    image-rendering: pixelated;
+  }
+  .hero-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold text-white;
+    background: rgb(255 255 255 / 0.18);
+    box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.25);
+  }
+  .hero-spark {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgb(255 255 255 / 0.8);
+    box-shadow: 6px 0 0 rgb(255 255 255 / 0.8), -6px 0 0 rgb(255 255 255 / 0.8), 0 6px 0 rgb(255 255 255 / 0.8), 0 -6px 0 rgb(255 255 255 / 0.8);
+    animation: hero-bob 3.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .hero-spark-sun {
+    background: var(--color-sun);
+    box-shadow: 6px 0 0 var(--color-sun), -6px 0 0 var(--color-sun), 0 6px 0 var(--color-sun), 0 -6px 0 var(--color-sun);
+  }
+  .hero-spark-red {
+    background: var(--color-accent);
+    box-shadow: 6px 0 0 var(--color-accent), -6px 0 0 var(--color-accent), 0 6px 0 var(--color-accent), 0 -6px 0 var(--color-accent);
+  }
+
+  .site-footer {
+    @apply relative mt-16 text-white;
+    background-color: var(--color-leaf-deep);
+    background-image: repeating-conic-gradient(rgb(255 255 255 / 0.05) 0 25%, transparent 0 50%);
+    background-size: 24px 24px;
+  }
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 14px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='14' shape-rendering='crispEdges'%3E%3Crect y='8' width='32' height='6' fill='%232f6b20'/%3E%3Crect x='2' y='4' width='2' height='4' fill='%232f6b20'/%3E%3Crect x='4' y='6' width='2' height='2' fill='%232f6b20'/%3E%3Crect x='12' y='2' width='2' height='6' fill='%232f6b20'/%3E%3Crect x='10' y='5' width='2' height='3' fill='%232f6b20'/%3E%3Crect x='22' y='5' width='2' height='3' fill='%232f6b20'/%3E%3Crect x='24' y='3' width='2' height='5' fill='%232f6b20'/%3E%3Crect x='28' y='6' width='2' height='2' fill='%232f6b20'/%3E%3C/svg%3E") repeat-x left bottom / 32px 14px;
+    image-rendering: pixelated;
+  }
+
   .section-bar {
-    @apply relative flex items-center gap-2.5 overflow-hidden rounded-2xl px-4 py-2.5 text-white;
+    @apply relative flex items-center gap-2.5 overflow-hidden rounded-xl px-4 py-2.5 text-white;
     background: var(--color-leaf);
-    box-shadow: 0 4px 0 var(--color-leaf-shadow);
+    box-shadow: 0 3px 0 var(--color-leaf-shadow);
+  }
+  .section-bar-sky {
+    background: var(--color-accent-2);
+    box-shadow: 0 3px 0 #1f4fa3;
+  }
+  .section-bar-berry {
+    background: #c2417a;
+    box-shadow: 0 3px 0 #8e2c58;
   }
   /* Pixel confetti on the right of section bars */
   .section-bar-pixels {
@@ -329,12 +438,20 @@ body {
     background-repeat: no-repeat;
   }
 
-  .prompt-card {
-    @apply flex flex-col gap-2 rounded-3xl p-5 text-ink;
+  /* Yellow callout for things you need to do first */
+  .notice {
+    @apply rounded-xl px-4 py-3 font-semibold text-ink;
+    background: var(--color-sun);
+    border: 2px solid #d9a90a;
+    box-shadow: 0 3px 0 #d9a90a;
+  }
+
+  .season-card {
+    @apply flex flex-col gap-2 rounded-xl p-5 text-ink;
     background-color: var(--color-sun);
     background-image: radial-gradient(rgb(255 255 255 / 0.35) 2px, transparent 2.5px);
     background-size: 16px 16px;
-    box-shadow: 0 5px 0 #d9a90a;
+    box-shadow: 0 3px 0 #d9a90a;
   }
 
   /* Buttons & chips */
@@ -368,6 +485,25 @@ body {
     box-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
   }
 
+  .btn-danger {
+    @apply text-white;
+    background: var(--color-accent);
+    box-shadow: 0 4px 0 #a8302a;
+  }
+  .btn-danger:active {
+    box-shadow: 0 1px 0 #a8302a;
+  }
+
+  .confirm-dialog {
+    /* p-0: the dialog's own padding would count as "backdrop" for click-to-close */
+    @apply m-auto w-[min(26rem,calc(100vw-2rem))] rounded-xl bg-cream p-0 text-ink;
+    border: 2px solid rgb(37 96 26 / 0.22);
+    box-shadow: 0 3px 0 rgb(37 96 26 / 0.16);
+  }
+  .confirm-dialog::backdrop {
+    background: rgb(29 27 34 / 0.45);
+  }
+
   .btn:disabled {
     @apply cursor-not-allowed opacity-70;
     transform: none;
@@ -395,13 +531,13 @@ body {
     color: #c0352e;
   }
   .error-box {
-    @apply flex flex-col gap-3 rounded-2xl px-4 py-3 sm:flex-row sm:items-center sm:justify-between;
+    @apply flex flex-col gap-3 rounded-xl px-4 py-3 sm:flex-row sm:items-center sm:justify-between;
     background: #fdeceb;
     border: 2px solid rgb(226 70 63 / 0.35);
     color: #8f2620;
   }
   .success-box {
-    @apply flex flex-wrap items-center gap-3 rounded-2xl px-4 py-3 font-bold text-leaf-deep;
+    @apply flex flex-wrap items-center gap-3 rounded-xl px-4 py-3 font-bold text-leaf-deep;
     background: var(--color-leaf-light);
     border: 2px solid rgb(63 138 43 / 0.35);
   }
@@ -446,34 +582,36 @@ body {
   }
 
   .emoji-badge {
-    @apply grid size-9 shrink-0 place-items-center rounded-xl text-lg;
+    @apply grid size-9 shrink-0 place-items-center rounded-lg text-lg;
     background: var(--color-leaf-light);
   }
+  li:nth-child(5n + 1) .emoji-badge { background: #fde7f0; }
+  li:nth-child(5n + 2) .emoji-badge { background: #e3f4d7; }
+  li:nth-child(5n + 3) .emoji-badge { background: #ffe8cc; }
+  li:nth-child(5n + 4) .emoji-badge { background: #dce8fb; }
+  li:nth-child(5n + 5) .emoji-badge { background: #ece1f9; }
   .emoji-badge-lg {
-    @apply size-12 rounded-2xl text-2xl;
+    @apply size-12 rounded-lg text-2xl;
   }
 
   /* Posts */
 
   .doodle-frame {
-    @apply overflow-hidden rounded-2xl bg-white;
+    @apply overflow-hidden rounded-lg bg-white;
     border: 3px solid var(--color-leaf-light);
   }
 
   .speech {
-    @apply relative rounded-2xl px-5 py-4 font-semibold leading-snug;
+    @apply relative rounded-xl px-5 py-4 font-semibold leading-snug;
     background: var(--color-leaf-light);
   }
 
   .tile-card {
-    @apply block rounded-2xl bg-cream p-2;
+    @apply block rounded-xl bg-cream p-2;
     border: 2px solid rgb(63 138 43 / 0.16);
-    box-shadow: 0 4px 0 rgb(63 138 43 / 0.18);
-    transition: transform 150ms ease;
+    box-shadow: 0 3px 0 rgb(63 138 43 / 0.18);
   }
-  .tile-card:hover {
-    transform: translateY(-2px);
-  }
+
 
   :where(a, button, input, select, textarea):focus-visible {
     outline: 3px solid var(--color-accent-2);

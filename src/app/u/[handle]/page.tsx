@@ -43,10 +43,10 @@ export default async function ProfilePage({ params, searchParams }: Props) {
         <p className="mt-1 font-bold text-white">
           @{user.handle} · joined {user.joined}
         </p>
-        <p className="mt-4 rounded-xl bg-cream px-4 py-3 text-ink">{user.bio}</p>
+        <p className="mt-4 rounded-lg bg-cream px-4 py-3 text-ink">{user.bio}</p>
         <dl className="mt-4 grid grid-cols-2 gap-3 sm:max-w-sm">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-xl bg-black/15 px-3 py-2 text-center">
+            <div key={s.label} className="rounded-lg bg-black/15 px-3 py-2 text-center">
               <dt className="text-xs font-bold uppercase tracking-wide text-white">{s.label}</dt>
               <dd className="text-2xl font-black tabular-nums">{s.value}</dd>
             </div>

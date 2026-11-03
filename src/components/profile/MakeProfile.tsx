@@ -52,7 +52,7 @@ function AlreadyHasProfile({ profile, justJoined, next }: { profile: Profile; ju
       className="card flex flex-col items-center gap-4 p-6 text-center sm:flex-row sm:text-left"
       role={justJoined ? "status" : undefined}
     >
-      <div className="w-28 shrink-0 overflow-hidden rounded-2xl border-4 border-leaf-light">
+      <div className="w-28 shrink-0 overflow-hidden rounded-lg border-4 border-leaf-light">
         <BitmapImage
           data={profile.avatar}
           width={PROFILE_PICTURE_SIZE}
@@ -246,7 +246,7 @@ function ProfileForm({ api, onJoined }: { api: EditorApi; onJoined: () => void }
         )}
       </div>
 
-      <p className="rounded-xl bg-leaf-light px-4 py-3 text-sm font-semibold text-leaf-deep">
+      <p className="rounded-lg bg-leaf-light px-4 py-3 text-sm font-semibold text-leaf-deep">
         This is a temporary profile saved to this browser. Full accounts are coming soon. If you clear
         your browser data or switch devices, you&apos;ll start a new profile.
       </p>

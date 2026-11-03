@@ -14,7 +14,8 @@ Built with Next.js, TypeScript, and Supabase, with a custom pixel-drawing engine
 - Three ink colors on a white canvas
 - Zoom inside a fixed window with edge arrows that show hidden areas; pan with the arrows, arrow keys, scroll, Space-drag, or the hand tool
 - Quarter-turn rotation (auto-fits the canvas) and a mirror flip view
-- Undo / redo (50 steps), clear (undoable), save as PNG
+- Undo / redo (50 steps), clear (undoable, asks first), save as PNG
+- Unposted drawings and animations auto-save in your browser, so leaving the page or pressing Back doesn't lose them
 - Keyboard shortcuts: `B` pen, `E` eraser, `G` fill, `H` hand, `[` `]` brush size, `1–3` colors, `R` / `Shift+R` quarter turn, `F` flip, arrow keys pan, `+` / `-` zoom, `0` reset view, `Ctrl/⌘+Z` undo, `Ctrl/⌘+Shift+Z` redo
 - Works with mouse, touch, and stylus (Pointer Events)
 
@@ -41,8 +42,8 @@ Draw on `/draw`, add an optional caption (80 characters), pick a plaza, and post
 
 ## Site UI (sample data)
 
-- **Plaza home:** hero, "Popular this week" strip, a feed of posts, today's prompt, and a list of plazas
-- **Plazas:** themed boards (Critters, Spooky Season, Tiny Worlds…) with their own feeds and a "Draw here" button
+- **Plaza home:** hero, "Popular this week" strip, a feed of posts, this season's theme, and a list of plazas
+- **Plazas:** themed boards (Free Draw, Critters, Fall Season, Tiny Worlds…) with their own feeds and a "Draw here" button
 - **Post pages:** the drawing, its replies (typed or drawn), and more from the artist
 - **Drawing-only posts:** every post is a drawing or animation (with an optional caption); text is only for replies
 - **Profiles:** bio, stats, and posts
@@ -93,7 +94,7 @@ src/
   app/                    Next.js routes (/, /draw)
   components/editor/      Drawing editor UI, useDrawingEditor (drawing) and useCanvasView (zoom/rotate/pan) hooks
   components/post/        Post composer, your-posts feed, local post page, guest profile
-  components/ui/          Site UI: header, post cards, tiles, Yeah button, mascot
+  components/ui/          Site UI: header, post cards, tiles, Yeah button
   lib/posts.ts            Posts API (Supabase)
   lib/profiles.ts         Guest profiles API (Supabase)
   lib/supabase/           Supabase clients for the browser, server, and proxy

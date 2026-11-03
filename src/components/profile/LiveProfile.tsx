@@ -64,7 +64,7 @@ export function LiveProfile({
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <section className="film">
         <div className="flex flex-wrap items-center gap-4">
-          <div className="w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white sm:w-28">
+          <div className="w-24 shrink-0 overflow-hidden rounded-lg border-4 border-white bg-white sm:w-28">
             <BitmapImage
               data={profile.avatar}
               width={PROFILE_PICTURE_SIZE}
@@ -84,7 +84,7 @@ export function LiveProfile({
             </Link>
           )}
         </div>
-        {profile.bio && <p className="mt-4 rounded-xl bg-cream px-4 py-3 text-ink">{profile.bio}</p>}
+        {profile.bio && <p className="mt-4 rounded-lg bg-cream px-4 py-3 text-ink">{profile.bio}</p>}
       </section>
 
       {(justDeleted || justUpdated) && isMe && (

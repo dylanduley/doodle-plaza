@@ -20,7 +20,7 @@ export const HANDLE_MAX = 20;
 const HANDLE_PATTERN = /^[a-z0-9_]+$/;
 
 // Routes and words that would be confusing as handles.
-const RESERVED_HANDLES = new Set(["you", "me", "admin", "doodleplaza", "pip", "settings", "signin"]);
+const RESERVED_HANDLES = new Set(["you", "me", "admin", "doodleplaza", "settings", "signin"]);
 
 export class ProfileError extends Error {
   readonly field: "handle" | "form";
