@@ -438,12 +438,14 @@ body::before {
     background-repeat: no-repeat;
   }
 
-  /* Yellow callout for things you need to do first */
+  /* Callout for things you need to do first */
   .notice {
-    @apply rounded-xl px-4 py-3 font-semibold text-ink;
-    background: var(--color-sun);
-    border: 2px solid #d9a90a;
-    box-shadow: 0 3px 0 #d9a90a;
+    @apply flex flex-col gap-3 rounded-xl bg-cream p-4 text-ink sm:flex-row sm:items-center sm:gap-4;
+    border: 2px solid rgb(37 96 26 / 0.22);
+    box-shadow: 0 3px 0 rgb(37 96 26 / 0.16);
+  }
+  .notice-icon {
+    @apply grid size-11 shrink-0 place-items-center rounded-lg bg-leaf-light text-leaf-deep;
   }
 
   .season-card {
