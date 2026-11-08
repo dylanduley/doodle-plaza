@@ -45,15 +45,20 @@ export default async function PlazaPage({ params }: Props) {
 
         <section className="flex flex-col gap-4" aria-labelledby="plaza-feed-heading">
           <SectionBar id="plaza-feed-heading" icon={<ClockIcon size={20} />} title="Latest posts" />
-          <PostsFeed plaza={plaza.slug} />
-          {feed.length === 0 ? (
-            <EmptyState title="No doodles yet">
-              <p>Be the first to post in {plaza.name}.</p>
-              <Link href={`/draw?plaza=${plaza.slug}`} className="btn btn-primary mt-4">
-                <PencilIcon size={18} /> Start drawing
-              </Link>
-            </EmptyState>
-          ) : (
+          <PostsFeed
+            plaza={plaza.slug}
+            empty={
+              feed.length === 0 && (
+                <EmptyState title="No doodles yet">
+                  <p>Be the first to post in {plaza.name}.</p>
+                  <Link href={`/draw?plaza=${plaza.slug}`} className="btn btn-primary mt-4">
+                    <PencilIcon size={18} /> Start drawing
+                  </Link>
+                </EmptyState>
+              )
+            }
+          />
+          {feed.length > 0 && (
             <ul className="flex flex-col gap-4">
               {feed.map((post) => (
                 <li key={post.id}>

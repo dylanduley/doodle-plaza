@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { PlazaCard, SectionBar } from "@/components/ui/Blocks";
+import { PlazaCards } from "@/components/post/PlazaCards";
+import { SectionBar } from "@/components/ui/Blocks";
 import { PlazasIcon } from "@/components/ui/icons";
 import { plazas } from "@/lib/mock/data";
 
@@ -15,13 +16,7 @@ export default function PlazasPage() {
         </p>
       </section>
       <SectionBar icon={<PlazasIcon size={20} />} title={`All plazas (${plazas.length})`} />
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {plazas.map((p) => (
-          <li key={p.slug} className="flex">
-            <PlazaCard plaza={p} />
-          </li>
-        ))}
-      </ul>
+      <PlazaCards />
     </div>
   );
 }

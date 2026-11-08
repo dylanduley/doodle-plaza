@@ -68,6 +68,16 @@ function toLivePost(row: PostRow): LivePost {
   };
 }
 
+/** Number of posts in each plaza. */
+export async function fetchPlazaCounts(slugs: string[]): Promise<Record<string, number>> {
+  const client = createClient();
+  const results = await Promise.all(
+    slugs.map((slug) => client.from("posts").select("id", { count: "exact", head: true }).eq("plaza", slug)),
+  );
+  if (results.some((r) => r.error)) throw new PostError("network", "We couldn't count the posts.");
+  return Object.fromEntries(slugs.map((slug, i) => [slug, results[i].count ?? 0]));
+}
+
 export async function fetchPosts(filter: { plaza?: string; authorId?: string } = {}): Promise<LivePost[]> {
   let query = createClient().from("posts").select(POST_FIELDS).order("created_at", { ascending: false }).limit(FEED_LIMIT);
   if (filter.plaza) query = query.eq("plaza", filter.plaza);

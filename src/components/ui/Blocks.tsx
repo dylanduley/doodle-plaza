@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { getPlaza, type Plaza, plazas, postsInPlaza, SEASON_THEME } from "@/lib/mock/data";
+import { getPlaza, type Plaza, plazas, SEASON_THEME } from "@/lib/mock/data";
 import { ArrowRightIcon, PencilIcon, PlazasIcon } from "./icons";
 
 export function SectionBar({
@@ -102,8 +102,8 @@ export function AboutCard() {
   );
 }
 
-export function PlazaCard({ plaza }: { plaza: Plaza }) {
-  const count = postsInPlaza(plaza.slug).length;
+/** count is undefined while it's loading */
+export function PlazaCard({ plaza, count }: { plaza: Plaza; count?: number }) {
   return (
     <Link href={`/plazas/${plaza.slug}`} className="card group flex w-full flex-col gap-3 p-5">
       <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ export function PlazaCard({ plaza }: { plaza: Plaza }) {
         <div className="min-w-0">
           <h2 className="truncate text-lg font-extrabold group-hover:underline">{plaza.name}</h2>
           <p className="text-sm text-muted">
-            {count} {count === 1 ? "post" : "posts"}
+            {count === undefined ? "\u00a0" : `${count} ${count === 1 ? "post" : "posts"}`}
           </p>
         </div>
         <ArrowRightIcon size={20} className="ml-auto text-leaf-dark" />
